@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SolarPlanner | Medición de Superficies</title>
+    <style>
+        :root {
+            --primary: #00d2ff;
+            --secondary: #3a7bd5;
+            --accent: #fbc531;
+            --bg: #0f172a;
+            --glass: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Contenedor Principal con Efecto Glass */
+        .container {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        h1 {
+            text-align: center;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Transiciones de Pasos */
+        .step {
+            display: none;
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Estilo de Inputs */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+        }
+
+        /* Botones Animados */
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(0, 210, 255, 0.4);
+        }
+
+        /* Resultado */
+        .result-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 16px;
+            margin-top: 20px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .stat {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-bottom: 30px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 33%;
+            transition: width 0.5s ease;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>SolarPlanner</h1>
+    
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div class="step active" id="step1">
+        <h3>1. Dimensiones del Techo</h3>
+        <div class="input-group">
+            <label>Ancho de la superficie (metros)</label>
+            <input type="number" id="width" placeholder="Ej: 10" step="0.1">
+        </div>
+        <div class="input-group">
+            <label>Largo de la superficie (metros)</label>
+            <input type="number" id="length" placeholder="Ej: 5" step="0.1">
+        </div>
+        <button onclick="nextStep(2)">Siguiente</button>
+    </div>
+
+    <div class="step" id="step2">
+        <h3>2. Configuración de Paneles</h3>
+        <div class="input-group">
+            <label>Tipo de Panel</label>
+            <select id="panelType">
+                <option value="1.6">Estándar (1.6m² - 330W)</option>
+                <option value="2.0">Grande (2.0m² - 450W+)</option>
+                <option value="1.2">Pequeño (1.2m²)</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Obstáculos / Espacio libre (%)</label>
+            <input type="number" id="buffer" value="10" placeholder="Ej: 10%">
+        </div>
+        <button onclick="nextStep(3)">Calcular Potencia</button>
+        <button onclick="nextStep(1)" style="background: transparent; border: 1px solid gray; margin-top: 5px;">Atrás</button>
+    </div>
+
+    <div class="step" id="step3">
+        <h3>Resultados Estimados</h3>
+        <div class="result-card" id="results">
+            </div>
+        <button onclick="reset()">Nueva Medición</button>
+    </div>
+</div>
+
+<script>
+    function nextStep(step) {
+        // Validación básica
+        if(step === 2) {
+            const w = document.getElementById('width').value;
+            const l = document.getElementById('length').value;
+            if(!w || !l) return alert("Por favor, ingresa las dimensiones.");
+        }
+
+        // Animación de salida y entrada
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        document.getElementById('step' + step).classList.add('active');
+        
+        // Actualizar barra de progreso
+        const progress = (step / 3) * 100;
+        document.getElementById('progressFill').style.width = progress + '%';
+
+        if(step === 3) calculate();
+    }
+
+    function calculate() {
+        const width = parseFloat(document.getElementById('width').value);
+        const length = parseFloat(document.getElementById('length').value);
+        const panelArea = parseFloat(document.getElementById('panelType').value);
+        const buffer = parseFloat(document.getElementById('buffer').value) / 100;
+
+        const totalArea = width * length;
+        const usableArea = totalArea * (1 - buffer);
+        const numPanels = Math.floor(usableArea / panelArea);
+        const estimatedKW = (numPanels * 0.4).toFixed(1); // Promedio 400W por panel
+
+        document.getElementById('results').innerHTML = `
+            <div class="stat"><span>Área Total:</span> <span class="stat-value">${totalArea.toFixed(2)} m²</span></div>
+            <div class="stat"><span>Área Útil:</span> <span class="stat-value">${usableArea.toFixed(2)} m²</span></div>
+            <div class="stat"><span>Cant. Paneles:</span> <span class="stat-value">${numPanels} unidades</span></div>
+            <div class="stat"><span>Potencia Est.:</span> <span class="stat-value">${estimatedKW} kWp</span></div>
+            <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 15px;">* Cálculos basados en disposición estándar y paneles de 400W.</p>
+        `;
+    }
+
+    function reset() {
+        document.getElementById('width').value = '';
+        document.getElementById('length').value = '';
+        nextStep(1);
+    }
+</script>
+
+</body>
+</html>
