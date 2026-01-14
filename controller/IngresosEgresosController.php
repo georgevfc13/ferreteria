@@ -41,10 +41,20 @@ function getAllIngresosEgresos() {
 // Función para insertar nuevo ingreso/egreso
 function insertIngresoEgreso($tipo, $monto, $descripcion, $categoria) {
     global $conn;
+    $monto = floatval($monto);
     $sql = "INSERT INTO ingresos_egresos (tipo, monto, descripcion, categoria) VALUES (?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        error_log("Error preparing statement: " . $conn->error);
+        return false;
+    }
     $stmt->bind_param("sdss", $tipo, $monto, $descripcion, $categoria);
-    return $stmt->execute();
+    $result = $stmt->execute();
+    if (!$result) {
+        error_log("Error executing statement: " . $stmt->error);
+        return false;
+    }
+    return $result;
 }
 
 // Función para "eliminar" (ocultar) ingreso/egreso
