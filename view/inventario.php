@@ -1,5 +1,26 @@
 <?php
 $pageTitle = 'Inventario';
+include '../controller/InventarioController.php';
+include '../controller/ProveedoresController.php';
+
+$filtro = $_GET['filtro'] ?? 'default';
+$productos = getProductos($filtro);
+$proveedores = getProveedores();
+
+// Manejar POST para insertar producto
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['agregar'])) {
+    $nombre = $_POST['nombre'];
+    $descripcion = $_POST['descripcion'];
+    $stock = $_POST['stock'];
+    $precio_compra = $_POST['precio_compra'];
+    $precio_venta = $_POST['precio_venta'];
+    $id_proveedor = $_POST['id_proveedor'];
+    if (insertProducto($nombre, $descripcion, $stock, $precio_compra, $precio_venta, $id_proveedor)) {
+        header("Location: inventario.php");
+        exit();
+    }
+}
+
 include '../template/header.php';
 ?>
 
@@ -8,68 +29,75 @@ include '../template/header.php';
 
     <!-- Filtros -->
     <div class="mb-8 bg-gray-50 rounded-lg p-6">
-        <label for="filter" class="block text-lg font-semibold text-dark mb-4">Filtrar Productos:</label>
-        <select id="filter" class="block w-full md:w-1/3 py-3 px-4 border border-gray-300 bg-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-gray-700">
-            <option value="default">Por defecto</option>
-            <option value="mas-stock">Más Stock</option>
-            <option value="menos-stock">Menos Stock</option>
-            <option value="mas-vendido">Más Vendido</option>
-            <option value="menos-vendido">Menos Vendido</option>
-            <option value="mayor-ganancia">Mayor Ganancia</option>
-        </select>
+        <form method="GET" class="flex items-center">
+            <label for="filtro" class="block text-lg font-semibold text-dark mr-4">Filtrar Productos:</label>
+            <select name="filtro" id="filtro" onchange="this.form.submit()" class="block w-full md:w-1/3 py-3 px-4 border border-gray-300 bg-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-gray-700">
+                <option value="default" <?php echo $filtro == 'default' ? 'selected' : ''; ?>>Por defecto</option>
+                <option value="mas-stock" <?php echo $filtro == 'mas-stock' ? 'selected' : ''; ?>>Más Stock</option>
+                <option value="menos-stock" <?php echo $filtro == 'menos-stock' ? 'selected' : ''; ?>>Menos Stock</option>
+                <option value="mas-vendido" <?php echo $filtro == 'mas-vendido' ? 'selected' : ''; ?>>Más Vendido</option>
+                <option value="menos-vendido" <?php echo $filtro == 'menos-vendido' ? 'selected' : ''; ?>>Menos Vendido</option>
+                <option value="mayor-ganancia" <?php echo $filtro == 'mayor-ganancia' ? 'selected' : ''; ?>>Mayor Ganancia</option>
+            </select>
+        </form>
     </div>
 
-    <!-- Lista de Productos -->
+    <!-- Formulario para Agregar Producto -->
+    <div class="bg-gray-50 rounded-lg p-6 mt-8">
+        <h2 class="text-2xl font-semibold text-dark mb-6 text-center">Agregar Nuevo Producto</h2>
+        <form method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
+                <input type="text" name="nombre" id="nombre" required class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary text-gray-900">
+            </div>
+            <div>
+                <label for="stock" class="block text-sm font-medium text-gray-700">Stock</label>
+                <input type="number" name="stock" id="stock" required class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary text-gray-900">
+            </div>
+            <div>
+                <label for="precio_compra" class="block text-sm font-medium text-gray-700">Precio Compra</label>
+                <input type="number" step="0.01" name="precio_compra" id="precio_compra" required class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary text-gray-900">
+            </div>
+            <div>
+                <label for="precio_venta" class="block text-sm font-medium text-gray-700">Precio Venta</label>
+                <input type="number" step="0.01" name="precio_venta" id="precio_venta" required class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary text-gray-900">
+            </div>
+            <div>
+                <label for="id_proveedor" class="block text-sm font-medium text-gray-700">Proveedor</label>
+                <select name="id_proveedor" id="id_proveedor" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary text-gray-900">
+                    <option value="">Seleccionar Proveedor</option>
+                    <?php foreach ($proveedores as $prov): ?>
+                        <option value="<?php echo $prov['id']; ?>"><?php echo htmlspecialchars($prov['nombre']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="md:col-span-2">
+                <label for="descripcion" class="block text-sm font-medium text-gray-700">Descripción</label>
+                <textarea name="descripcion" id="descripcion" rows="3" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary text-gray-900"></textarea>
+            </div>
+            <div class="md:col-span-2">
+                <button type="submit" name="agregar" class="w-full bg-primary text-secondary py-2 px-4 rounded-md hover:bg-secondary hover:text-primary transition duration-300">Agregar Producto</button>
+            </div>
+        </form>
+    </div>
     <div id="productos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div class="bg-gray-50 rounded-xl shadow-lg p-6 transition duration-300 hover:shadow-xl hover:transform hover:scale-105 producto" data-stock="50" data-vendido="120" data-ganancia="200">
-            <div class="flex items-center mb-4">
-                <i class="fas fa-hammer text-secondary text-3xl mr-3"></i>
-                <h2 class="text-xl font-semibold text-dark">Martillo</h2>
-            </div>
-            <p class="text-gray-700 mb-2"><strong>Stock:</strong> 50</p>
-            <p class="text-gray-700 mb-2"><strong>Vendidos:</strong> 120</p>
-            <p class="text-gray-700"><strong>Ganancia:</strong> $200</p>
-        </div>
-        <!-- Más productos -->
-        <div class="bg-gray-50 rounded-xl shadow-lg p-6 transition duration-300 hover:shadow-xl hover:transform hover:scale-105 producto" data-stock="200" data-vendido="80" data-ganancia="150">
-            <div class="flex items-center mb-4">
-                <i class="fas fa-screwdriver text-secondary text-3xl mr-3"></i>
-                <h2 class="text-xl font-semibold text-dark">Tornillos M5</h2>
-            </div>
-            <p class="text-gray-700 mb-2"><strong>Stock:</strong> 200</p>
-            <p class="text-gray-700 mb-2"><strong>Vendidos:</strong> 80</p>
-            <p class="text-gray-700"><strong>Ganancia:</strong> $150</p>
-        </div>
+        <?php if (!empty($productos)): ?>
+            <?php foreach ($productos as $producto): ?>
+                <div class="bg-gray-50 rounded-xl shadow-lg p-6 transition duration-300 hover:shadow-xl hover:transform hover:scale-105 producto" data-stock="<?php echo $producto['stock']; ?>" data-vendido="<?php echo $producto['vendido'] ?? 0; ?>" data-ganancia="<?php echo $producto['precio_venta'] - $producto['precio_compra']; ?>">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-hammer text-secondary text-3xl mr-3"></i>
+                        <h2 class="text-xl font-semibold text-dark"><?php echo htmlspecialchars($producto['nombre']); ?></h2>
+                    </div>
+                    <p class="text-gray-700 mb-2"><strong>Stock:</strong> <?php echo $producto['stock']; ?></p>
+                    <p class="text-gray-700 mb-2"><strong>Vendidos:</strong> <?php echo $producto['vendido'] ?? 0; ?></p>
+                    <p class="text-gray-700"><strong>Ganancia:</strong> $<?php echo number_format($producto['precio_venta'] - $producto['precio_compra'], 2); ?></p>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <p class="text-gray-600">No hay productos registrados.</p>
+        <?php endif; ?>
     </div>
 </main>
-
-<script>
-    document.getElementById('filter').addEventListener('change', function() {
-        const filter = this.value;
-        const productos = Array.from(document.querySelectorAll('.producto'));
-        
-        productos.sort((a, b) => {
-            switch(filter) {
-                case 'mas-stock':
-                    return parseInt(b.dataset.stock) - parseInt(a.dataset.stock);
-                case 'menos-stock':
-                    return parseInt(a.dataset.stock) - parseInt(b.dataset.stock);
-                case 'mas-vendido':
-                    return parseInt(b.dataset.vendido) - parseInt(a.dataset.vendido);
-                case 'menos-vendido':
-                    return parseInt(a.dataset.vendido) - parseInt(b.dataset.vendido);
-                case 'mayor-ganancia':
-                    return parseInt(b.dataset.ganancia) - parseInt(a.dataset.ganancia);
-                default:
-                    return 0;
-            }
-        });
-        
-        const container = document.getElementById('productos');
-        container.innerHTML = '';
-        productos.forEach(p => container.appendChild(p));
-    });
-</script>
 
 <?php
 include '../template/footer.php';

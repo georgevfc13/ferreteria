@@ -12,7 +12,8 @@ CREATE TABLE proveedores (
     telefono VARCHAR(20),
     email VARCHAR(100),
     direccion TEXT,
-    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    activo TINYINT(1) DEFAULT 1
 );
 
 -- Tabla de productos
@@ -26,6 +27,7 @@ CREATE TABLE productos (
     precio_venta DECIMAL(10,2) NOT NULL,
     id_proveedor INT,
     fecha_agregado TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    activo TINYINT(1) DEFAULT 1,
     FOREIGN KEY (id_proveedor) REFERENCES proveedores(id)
 );
 
@@ -59,7 +61,8 @@ CREATE TABLE ingresos_egresos (
     monto DECIMAL(10,2) NOT NULL,
     descripcion TEXT,
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    categoria VARCHAR(50) -- Ej: venta, compra, gasto operativo, etc.
+    categoria VARCHAR(50), -- Ej: venta, compra, gasto operativo, etc.
+    activo TINYINT(1) DEFAULT 1 -- Para ocultar en lugar de eliminar
 );
 
 -- Insertar datos de ejemplo

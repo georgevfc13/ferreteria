@@ -1,13 +1,22 @@
 <?php
 $pageTitle = 'Inicio';
+include '../controller/HomeController.php';
+
+// Obtener datos
+$ventasDia = getVentasDelDia();
+$productosMasVendidos = getProductosMasVendidos();
+$productosBajoStock = getProductosBajoStock();
+$ingresosNetos = getIngresosNetosSemanales();
+$datosGrafica = getDatosGraficaSemanal();
+
 include '../template/header.php';
 ?>
 
 <!-- Hero Section -->
 <section class="bg-gradient-to-r from-primary to-secondary bg-opacity-70 text-accent py-20">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h1 class="text-4xl md:text-6xl font-bold mb-4">Bienvenido a Ferretería XYZ</h1>
-        <p class="text-xl md:text-2xl mb-8">Tu aliado en herramientas y materiales de construcción</p>
+        <h1 class="text-4xl md:text-6xl font-bold mb-4">Bienvenido a Ferretería JJ</h1>
+        <p class="text-xl md:text-2xl mb-8">Software echo por mi</p>
         <a href="#dashboard" class="bg-accent text-secondary px-8 py-3 rounded-full font-semibold text-lg hover:bg-dark hover:text-accent transition duration-300 transform hover:scale-105">Ver Dashboard</a>
     </div>
 </section>
@@ -22,8 +31,8 @@ include '../template/header.php';
                 <i class="fas fa-dollar-sign text-secondary text-3xl mr-3"></i>
                 <h3 class="text-xl font-semibold text-dark">Ventas del Día</h3>
             </div>
-            <p class="text-2xl font-bold text-secondary">$1,250.00</p>
-            <p class="text-gray-600">45 transacciones</p>
+            <p class="text-2xl font-bold text-secondary">$<?php echo number_format($ventasDia['total_ventas'] ?? 0, 2); ?></p>
+            <p class="text-gray-600"><?php echo $ventasDia['num_transacciones'] ?? 0; ?> transacciones</p>
         </div>
 
         <!-- Producto Más Vendido -->
@@ -32,8 +41,12 @@ include '../template/header.php';
                 <i class="fas fa-star text-primary text-3xl mr-3"></i>
                 <h3 class="text-xl font-semibold text-dark">Más Vendido</h3>
             </div>
-            <p class="text-lg font-semibold text-dark">Martillo de acero</p>
-            <p class="text-gray-600">120 unidades</p>
+            <?php if (!empty($productosMasVendidos)): ?>
+                <p class="text-lg font-semibold text-dark"><?php echo $productosMasVendidos[0]['nombre']; ?></p>
+                <p class="text-gray-600"><?php echo $productosMasVendidos[0]['total_vendido']; ?> unidades</p>
+            <?php else: ?>
+                <p class="text-gray-600">No hay datos</p>
+            <?php endif; ?>
         </div>
 
         <!-- Productos con Bajo Stock -->
@@ -43,8 +56,13 @@ include '../template/header.php';
                 <h3 class="text-xl font-semibold text-dark">Bajo Stock</h3>
             </div>
             <ul class="text-sm text-gray-600">
-                <li>Tornillos M5: 5</li>
-                <li>Pintura blanca: 2</li>
+                <?php if (!empty($productosBajoStock)): ?>
+                    <?php foreach (array_slice($productosBajoStock, 0, 3) as $producto): ?>
+                        <li><?php echo $producto['nombre']; ?>: <?php echo $producto['stock']; ?> unidades</li>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <li>No hay productos con bajo stock</li>
+                <?php endif; ?>
             </ul>
         </div>
 
@@ -54,7 +72,7 @@ include '../template/header.php';
                 <i class="fas fa-chart-pie text-primary text-3xl mr-3"></i>
                 <h3 class="text-xl font-semibold text-dark">Ingresos Netos</h3>
             </div>
-            <p class="text-2xl font-bold text-secondary">$700.00</p>
+            <p class="text-2xl font-bold text-secondary">$<?php echo number_format($ingresosNetos, 2); ?></p>
             <p class="text-gray-600">Esta semana</p>
         </div>
     </div>
@@ -72,18 +90,18 @@ include '../template/header.php';
     const weeklyChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
+            labels: <?php echo json_encode($datosGrafica['dias']); ?>,
             datasets: [{
                 label: 'Ingresos',
-                data: [1200, 1500, 1800, 1400, 1600, 1900, 1700],
-                borderColor: '#008000',
-                backgroundColor: 'rgba(0, 128, 0, 0.1)',
+                data: <?php echo json_encode($datosGrafica['ingresos']); ?>,
+                borderColor: '#32CD32',
+                backgroundColor: 'rgba(50, 205, 50, 0.1)',
                 tension: 0.4
             }, {
                 label: 'Gastos',
-                data: [800, 900, 700, 1000, 850, 950, 750],
-                borderColor: '#FFFF00',
-                backgroundColor: 'rgba(255, 255, 0, 0.1)',
+                data: <?php echo json_encode($datosGrafica['egresos']); ?>,
+                borderColor: '#FFD700',
+                backgroundColor: 'rgba(255, 215, 0, 0.1)',
                 tension: 0.4
             }]
         },
