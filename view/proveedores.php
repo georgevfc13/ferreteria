@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['agregar'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['eliminar'])) {
     $id = $_POST['id'];
     $codigo = $_POST['codigo'];
-    $codigo_correcto = substr(md5($id), 0, 6);
+    $codigo_correcto = str_pad($id, 6, '0', STR_PAD_LEFT);
     if ($codigo === $codigo_correcto) {
         ocultarProveedor($id);
         header("Location: proveedores.php");
@@ -120,6 +120,7 @@ include '../template/header.php';
     </div>
 
     <form id="deleteForm" method="POST" style="display: none;">
+        <input type="hidden" name="eliminar" value="1">
         <input type="hidden" name="id" id="deleteId">
         <input type="hidden" name="codigo" id="deleteCode">
     </form>
