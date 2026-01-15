@@ -12,10 +12,10 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#FFD700', // Amarillo dorado suave
-                        secondary: '#32CD32', // Verde lima
-                        accent: '#FFFFFF', // Blanco
-                        dark: '#2D3748' // Gris oscuro para texto
+                        primary: '#FFD700',
+                        secondary: '#32CD32',
+                        accent: '#FFFFFF',
+                        dark: '#2D3748'
                     }
                 }
             }
@@ -33,7 +33,7 @@
                     <!-- Logo y Nombre -->
                     <div class="flex-shrink-0 flex items-center space-x-2">
                         <i class="fas fa-tools text-accent text-2xl"></i>
-                        <span class="text-xl font-bold text-accent">Ferretería XYZ</span>
+                        <span class="text-xl font-bold text-accent">Ferretería JJ</span>
                     </div>
                 </div>
                 <!-- Menú Desktop -->
@@ -42,6 +42,7 @@
                     <a href="ingresos_egresos.php" class="text-accent hover:text-dark px-3 py-2 rounded-md text-sm font-medium transition duration-300 transform hover:scale-105"><i class="fas fa-chart-line mr-1"></i>Ingresos y Egresos</a>
                     <a href="proveedores.php" class="text-accent hover:text-dark px-3 py-2 rounded-md text-sm font-medium transition duration-300 transform hover:scale-105"><i class="fas fa-truck mr-1"></i>Nuestros Proveedores</a>
                     <a href="inventario.php" class="text-accent hover:text-dark px-3 py-2 rounded-md text-sm font-medium transition duration-300 transform hover:scale-105"><i class="fas fa-boxes mr-1"></i>Inventario</a>
+                    <a href="cierre_caja.php" class="text-accent hover:text-dark px-3 py-2 rounded-md text-sm font-medium transition duration-300 transform hover:scale-105"><i class="fas fa-cash-register mr-1"></i>Cierre de Caja</a>
                 </div>
                 <!-- Menú Hamburguesa -->
                 <div class="md:hidden flex items-center">
@@ -57,5 +58,6 @@
             <a href="ingresos_egresos.php" class="text-accent hover:bg-primary hover:text-dark block px-3 py-2 rounded-md text-base font-medium transition duration-300"><i class="fas fa-chart-line mr-2"></i>Ingresos y Egresos</a>
             <a href="proveedores.php" class="text-accent hover:bg-primary hover:text-dark block px-3 py-2 rounded-md text-base font-medium transition duration-300"><i class="fas fa-truck mr-2"></i>Nuestros Proveedores</a>
             <a href="inventario.php" class="text-accent hover:bg-primary hover:text-dark block px-3 py-2 rounded-md text-base font-medium transition duration-300"><i class="fas fa-boxes mr-2"></i>Inventario</a>
+            <a href="cierre_caja.php" class="text-accent hover:bg-primary hover:text-dark block px-3 py-2 rounded-md text-base font-medium transition duration-300"><i class="fas fa-cash-register mr-2"></i>Cierre de Caja</a>
         </div>
     </nav>

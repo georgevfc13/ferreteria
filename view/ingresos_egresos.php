@@ -2,6 +2,7 @@
 $pageTitle = 'Ingresos y Egresos';
 include '../controller/IngresosEgresosController.php';
 include '../controller/InventarioController.php';
+include '../controller/ProveedoresController.php';
 
 // Manejar POST para insertar
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['agregar'])) {
@@ -31,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['agregar'])) {
                 $descripcion = $nombre_producto;
                 $categoria = $nombre_producto;
                 
-                if (insertIngresoEgreso($tipo, $monto, $descripcion, $categoria)) {
+                if (insertIngresoEgreso($tipo, $monto, $descripcion, $categoria, $id_producto, $cantidad)) {
                     // Guardar en sesión para mostrar animación
                     session_start();
                     $_SESSION['mostrar_animacion'] = $tipo;
@@ -96,141 +97,10 @@ $todos = getAllIngresosEgresos();
 $productos = getProductos('default');
 
 // Obtener proveedores
-include '../controller/ProveedoresController.php';
 $proveedores = getProveedores();
 
 include '../template/header.php';
 ?>
-
-<style>
-    /* Estilos mejorados para el formulario */
-    .form-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .tab-button.active {
-        background: rgba(255, 255, 255, 0.3) !important;
-        border-bottom: 3px solid #FFD700;
-    }
-    
-    .tab-content.hidden {
-        display: none;
-    }
-    
-    .form-card::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-        animation: rotate 20s linear infinite;
-    }
-    
-    @keyframes rotate {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-    }
-    
-    .form-input {
-        transition: all 0.3s ease;
-    }
-    
-    .form-input:focus {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
-    }
-    
-    .submit-btn {
-        background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .submit-btn::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 0;
-        height: 0;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.3);
-        transform: translate(-50%, -50%);
-        transition: width 0.6s, height 0.6s;
-    }
-    
-    .submit-btn:hover::after {
-        width: 300px;
-        height: 300px;
-    }
-    
-    /* Animación de arena cayendo (para egresos) */
-    .sand-particle {
-        position: fixed;
-        width: 4px;
-        height: 4px;
-        background: #D4A574;
-        border-radius: 50%;
-        pointer-events: none;
-        z-index: 9999;
-        box-shadow: 0 0 3px rgba(212, 165, 116, 0.5);
-    }
-    
-    @keyframes sandfall {
-        0% {
-            transform: translateY(0) rotate(0deg);
-            opacity: 1;
-        }
-        100% {
-            transform: translateY(var(--fall-distance)) rotate(360deg);
-            opacity: 0;
-        }
-    }
-    
-    /* Animación de avión de papel (para ingresos) */
-    .paper-plane {
-        position: fixed;
-        width: 40px;
-        height: 40px;
-        pointer-events: none;
-        z-index: 9999;
-        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-    }
-    
-    @keyframes planefly {
-        0% {
-            transform: translate(0, 0) rotate(-15deg);
-            opacity: 1;
-        }
-        50% {
-            transform: translate(var(--mid-x), var(--mid-y)) rotate(-5deg) scale(1.2);
-        }
-        100% {
-            transform: translate(var(--end-x), var(--end-y)) rotate(5deg) scale(0.8);
-            opacity: 0;
-        }
-    }
-    
-    /* Efecto de pulso en la gráfica */
-    @keyframes chartPulse {
-        0%, 100% {
-            transform: scale(1);
-            box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
-        }
-        50% {
-            transform: scale(1.02);
-            box-shadow: 0 0 20px 10px rgba(102, 126, 234, 0);
-        }
-    }
-    
-    .chart-pulse {
-        animation: chartPulse 1.5s ease-in-out;
-    }
-</style>
 
 <main class="container mx-auto px-4 py-8 bg-white bg-opacity-70 rounded-lg shadow-lg mx-4 md:mx-auto my-8">
     <h1 class="text-3xl font-bold text-dark mb-6 text-center">Ingresos y Egresos</h1>
@@ -372,8 +242,8 @@ include '../template/header.php';
             <?php foreach ($todos as $mov): ?>
                 <div class="flex justify-between items-center bg-white p-4 rounded-lg shadow">
                     <div>
-                        <p class="font-semibold"><?php echo ucfirst($mov['tipo']); ?>: $<?php echo number_format($mov['monto'], 2); ?> - <?php echo $mov['descripcion']; ?> (<?php echo $mov['categoria']; ?>)</p>
-                        <p class="text-sm text-gray-600"><?php echo $mov['fecha']; ?></p>
+                        <p class="font-semibold text-dark"><?php echo ucfirst($mov['tipo']); ?>: $<?php echo number_format($mov['monto'], 2); ?> - <?php echo $mov['descripcion']; ?> (<?php echo $mov['categoria']; ?>)</p>
+                        <p class="text-sm text-green-800"><?php echo $mov['fecha']; ?></p>
                     </div>
                     <button onclick="openDeleteModal(<?php echo $mov['id']; ?>, '<?php echo addslashes($mov['descripcion']); ?>')" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300">Eliminar</button>
                 </div>
@@ -389,7 +259,7 @@ include '../template/header.php';
                 <div class="mt-2 px-7 py-3">
                     <p class="text-sm text-gray-500">¿Estás seguro de eliminar este movimiento? Escribe el código de confirmación:</p>
                     <p class="text-xs text-gray-400 mt-2" id="confirmationCode"></p>
-                    <input type="text" id="codeInput" class="mt-2 px-3 py-2 border border-gray-300 rounded-md w-full">
+                    <input type="text" id="codeInput" class="mt-2 px-3 py-2 border border-gray-300 rounded-md w-full text-gray-700">
                 </div>
                 <div class="flex items-center px-4 py-3">
                     <button id="cancelBtn" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300 mr-2">Cancelar</button>
@@ -406,17 +276,17 @@ include '../template/header.php';
     </form>
 </main>
 
+<link rel="stylesheet" href="../css/ingresos_egresos.css">
+<script src="../js/ingresos_egresos.js"></script>
+
 <script>
     // Cambiar entre tabs
     function showTab(tabName) {
-        // Ocultar todos los tabs
         const tabs = document.querySelectorAll('.tab-content');
         tabs.forEach(tab => tab.classList.add('hidden'));
         
-        // Mostrar el tab seleccionado
         document.getElementById('tab-' + tabName).classList.remove('hidden');
         
-        // Actualizar botones activos
         const buttons = document.querySelectorAll('.tab-button');
         buttons.forEach(btn => btn.classList.remove('active'));
         event.target.classList.add('active');
@@ -434,7 +304,6 @@ include '../template/header.php';
         const total = precio * cantidad;
         
         montoTotalInput.value = total > 0 ? total.toFixed(2) : '0.00';
-        console.log(`Producto: ${selectedOption.text}, Precio: ${precio}, Cantidad: ${cantidad}, Total: ${total}`);
     }
     
     if (productoSelect) {
@@ -446,23 +315,11 @@ include '../template/header.php';
     
     // Interceptar el envío del formulario para activar la animación
     document.getElementById('movementFormIngreso').addEventListener('submit', function(e) {
-        const tipo = 'ingreso';
-        console.log('Tipo seleccionado:', tipo);
-        
-        // Ejecutar la animación en paralelo (sin prevenir el envío)
         createPaperPlaneEffect();
-        
-        // El formulario se envía normalmente
     });
     
     document.getElementById('movementFormEgreso').addEventListener('submit', function(e) {
-        const tipo = 'egreso';
-        console.log('Tipo seleccionado:', tipo);
-        
-        // Ejecutar la animación en paralelo (sin prevenir el envío)
         createSandEffect();
-        
-        // El formulario se envía normalmente
     });
     
     function openDeleteModal(id, descripcion) {
@@ -484,150 +341,56 @@ include '../template/header.php';
         document.getElementById('deleteForm').submit();
     });
 
-    // Función para crear efecto de arena (egresos)
-    function createSandEffect() {
-        const formRect = document.getElementById('formContainer').getBoundingClientRect();
-        const chartRect = document.getElementById('chartContainer').getBoundingClientRect();
-        
-        const startX = formRect.left + formRect.width / 2;
-        const startY = formRect.bottom;
-        const endY = chartRect.top;
-        
-        console.log('Creando efecto de arena');
-        
-        // Crear múltiples partículas de arena
-        for (let i = 0; i < 50; i++) {
-            setTimeout(() => {
-                const particle = document.createElement('div');
-                particle.className = 'sand-particle';
-                particle.style.left = (startX + (Math.random() - 0.5) * 100) + 'px';
-                particle.style.top = startY + 'px';
-                particle.style.setProperty('--fall-distance', (endY - startY) + 'px');
-                particle.style.animation = `sandfall ${1.5 + Math.random() * 0.5}s ease-in forwards`;
-                
-                document.body.appendChild(particle);
-                
-                setTimeout(() => particle.remove(), 2500);
-            }, i * 30);
-        }
-        
-        // Efecto de pulso en la gráfica
-        setTimeout(() => {
-            document.getElementById('chartContainer').classList.add('chart-pulse');
-            setTimeout(() => {
-                document.getElementById('chartContainer').classList.remove('chart-pulse');
-            }, 1500);
-        }, 1200);
-    }
-
-    // Función para crear efecto de avión de papel (ingresos)
-    function createPaperPlaneEffect() {
-        const formRect = document.getElementById('formContainer').getBoundingClientRect();
-        const chartRect = document.getElementById('chartContainer').getBoundingClientRect();
-        
-        const startX = formRect.left + formRect.width / 2;
-        const startY = formRect.bottom;
-        const endX = chartRect.left + chartRect.width / 2;
-        const endY = chartRect.top + chartRect.height / 2;
-        
-        console.log('Creando efecto de avión de papel');
-        
-        // Crear 3 aviones de papel
-        for (let i = 0; i < 3; i++) {
-            setTimeout(() => {
-                const plane = document.createElement('div');
-                plane.className = 'paper-plane';
-                plane.innerHTML = `
-                    <svg viewBox="0 0 24 24" fill="#4CAF50" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                    </svg>
-                `;
-                plane.style.left = startX + 'px';
-                plane.style.top = startY + 'px';
-                
-                const midX = (endX - startX) / 2 + (Math.random() - 0.5) * 200;
-                const midY = (endY - startY) / 2 - 100 + (Math.random() - 0.5) * 100;
-                
-                plane.style.setProperty('--mid-x', midX + 'px');
-                plane.style.setProperty('--mid-y', midY + 'px');
-                plane.style.setProperty('--end-x', (endX - startX) + 'px');
-                plane.style.setProperty('--end-y', (endY - startY) + 'px');
-                plane.style.animation = `planefly ${2 + Math.random() * 0.5}s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards`;
-                
-                document.body.appendChild(plane);
-                
-                setTimeout(() => plane.remove(), 3000);
-            }, i * 200);
-        }
-        
-        // Efecto de pulso en la gráfica
-        setTimeout(() => {
-            document.getElementById('chartContainer').classList.add('chart-pulse');
-            setTimeout(() => {
-                document.getElementById('chartContainer').classList.remove('chart-pulse');
-            }, 1500);
-        }, 1500);
-    }
-
-    // Interceptar el envío del formulario para activar la animación
-    document.getElementById('movementForm').addEventListener('submit', function(e) {
-        const tipo = document.getElementById('tipo').value;
-        console.log('Tipo seleccionado:', tipo);
-        
-        // Ejecutar la animación en paralelo (sin prevenir el envío)
-        if (tipo === 'egreso') {
-            createSandEffect();
-        } else if (tipo === 'ingreso') {
-            createPaperPlaneEffect();
-        }
-        
-        // El formulario se envía normalmente
-    });
-
-    // Cargar datos de PHP y mostrar en consola
+    // Cargar datos de PHP y mostrar gráfica
     const diasData = <?php echo json_encode(array_column($datosSemanales, 'dia')); ?>;
-    const ingresosData = <?php echo json_encode(array_column($datosSemanales, 'ingresos')); ?>;
-    const egresosData = <?php echo json_encode(array_column($datosSemanales, 'egresos')); ?>;
+    const ingresosData = <?php echo json_encode(array_map('floatval', array_column($datosSemanales, 'ingresos'))); ?>;
+    const egresosData = <?php echo json_encode(array_map('floatval', array_column($datosSemanales, 'egresos'))); ?>;
     
-    console.log('Datos semanales - Días:', diasData);
-    console.log('Datos semanales - Ingresos:', ingresosData);
-    console.log('Datos semanales - Egresos:', egresosData);
-    
-    const ctx = document.getElementById('detailedChart');
-    if (ctx) {
-        const detailedChart = new Chart(ctx.getContext('2d'), {
-            type: 'bar',
-            data: {
-                labels: diasData,
-                datasets: [{
-                    label: 'Ingresos',
-                    data: ingresosData,
-                    backgroundColor: '#32CD32'
-                }, {
-                    label: 'Gastos',
-                    data: egresosData,
-                    backgroundColor: '#FFD700'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    }
+    // Esperar a que el DOM esté listo
+    setTimeout(function() {
+        const ctx = document.getElementById('detailedChart');
+        if (ctx) {
+            const detailedChart = new Chart(ctx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: diasData,
+                    datasets: [{
+                        label: 'Ingresos',
+                        data: ingresosData,
+                        backgroundColor: '#32CD32',
+                        borderColor: '#228B22',
+                        borderWidth: 1
+                    }, {
+                        label: 'Gastos',
+                        data: egresosData,
+                        backgroundColor: '#FFD700',
+                        borderColor: '#DAA520',
+                        borderWidth: 1
+                    }]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    indexAxis: 'x',
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toFixed(2);
+                                }
+                            }
+                        }
                     }
                 }
-            }
-        });
-        console.log('Gráfica creada exitosamente');
-    } else {
-        console.error('No se encontró el elemento canvas detailedChart');
-    }
+            });
+        }
+    }, 100);
 </script>
 
 <?php

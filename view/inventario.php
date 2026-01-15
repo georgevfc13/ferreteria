@@ -6,6 +6,7 @@ include '../controller/ProveedoresController.php';
 $filtro = $_GET['filtro'] ?? 'default';
 $productos = getProductos($filtro);
 $proveedores = getProveedores();
+$productosBajoStock = getProductosBajoStock(10);
 
 // Manejar POST para insertar producto
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['agregar'])) {
@@ -21,8 +22,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['agregar'])) {
     }
 }
 
+// Manejar edición de producto
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editar'])) {
+    $id = $_POST['id'];
+    $nombre = $_POST['nombre'];
+    $descripcion = $_POST['descripcion'];
+    $stock = $_POST['stock'];
+    $precio_compra = $_POST['precio_compra'];
+    $precio_venta = $_POST['precio_venta'];
+    $id_proveedor = $_POST['id_proveedor'];
+    if (editarProducto($id, $nombre, $descripcion, $stock, $precio_compra, $precio_venta, $id_proveedor)) {
+        header("Location: inventario.php");
+        exit();
+    }
+}
+
+// Manejar eliminación de producto
+if (isset($_GET['eliminar'])) {
+    $id = intval($_GET['eliminar']);
+    if (ocultarProducto($id)) {
+        header("Location: inventario.php");
+        exit();
+    }
+}
+
 include '../template/header.php';
 ?>
+
+<!-- Notificaciones de Bajo Stock (esquina derecha) -->
+<?php if (!empty($productosBajoStock)): ?>
+    <div class="fixed top-20 right-4 z-50 space-y-3 max-w-sm">
+        <?php foreach ($productosBajoStock as $prod): ?>
+            <div class="bg-red-100 border-l-4 border-red-600 p-4 rounded-lg shadow-lg">
+                <div class="flex items-start">
+                    <i class="fas fa-exclamation-circle text-red-600 text-xl mr-3 mt-1"></i>
+                    <div>
+                        <p class="font-bold text-red-800"><?php echo htmlspecialchars($prod['nombre']); ?></p>
+                        <p class="text-red-700 text-sm">Stock bajo: <?php echo $prod['stock']; ?> unidades</p>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
 
 <main class="container mx-auto px-4 py-8 bg-white bg-opacity-70 rounded-lg shadow-lg mx-4 md:mx-auto my-8">
     <h1 class="text-3xl font-bold text-dark mb-6 text-center">Inventario</h1>
@@ -83,14 +125,32 @@ include '../template/header.php';
     <div id="productos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <?php if (!empty($productos)): ?>
             <?php foreach ($productos as $producto): ?>
-                <div class="bg-gray-50 rounded-xl shadow-lg p-6 transition duration-300 hover:shadow-xl hover:transform hover:scale-105 producto" data-stock="<?php echo $producto['stock']; ?>" data-vendido="<?php echo $producto['vendido'] ?? 0; ?>" data-ganancia="<?php echo $producto['precio_venta'] - $producto['precio_compra']; ?>">
+                <div class="rounded-xl shadow-lg p-6 transition duration-300 hover:shadow-xl hover:transform hover:scale-105 producto 
+                    <?php echo $producto['stock'] <= 0 ? 'bg-gray-200 opacity-50' : 'bg-gray-50'; ?>"
+                    data-stock="<?php echo $producto['stock']; ?>" 
+                    data-vendido="<?php echo $producto['vendido'] ?? 0; ?>" 
+                    data-ganancia="<?php echo $producto['precio_venta'] - $producto['precio_compra']; ?>">
+                    
                     <div class="flex items-center mb-4">
                         <i class="fas fa-hammer text-secondary text-3xl mr-3"></i>
                         <h2 class="text-xl font-semibold text-dark"><?php echo htmlspecialchars($producto['nombre']); ?></h2>
                     </div>
+                    
                     <p class="text-gray-700 mb-2"><strong>Stock:</strong> <?php echo $producto['stock']; ?></p>
                     <p class="text-gray-700 mb-2"><strong>Vendidos:</strong> <?php echo $producto['vendido'] ?? 0; ?></p>
-                    <p class="text-gray-700"><strong>Ganancia:</strong> $<?php echo number_format($producto['precio_venta'] - $producto['precio_compra'], 2); ?></p>
+                    <p class="text-gray-700 mb-4"><strong>Ganancia:</strong> $<?php echo number_format($producto['precio_venta'] - $producto['precio_compra'], 2); ?></p>
+                    
+                    <div class="flex gap-2 mb-3">
+                        <a href="kardex.php?producto_id=<?php echo $producto['id']; ?>" class="flex-1 bg-primary text-secondary text-center py-2 px-3 rounded font-semibold hover:bg-secondary hover:text-primary transition duration-300 text-sm">
+                            <i class="fas fa-chart-line mr-1"></i>Kardex
+                        </a>
+                        <a href="editar_producto.php?id=<?php echo $producto['id']; ?>" class="flex-1 bg-blue-600 text-white text-center py-2 px-3 rounded font-semibold hover:bg-blue-700 transition duration-300 text-sm">
+                            <i class="fas fa-edit mr-1"></i>Editar
+                        </a>
+                        <a href="inventario.php?eliminar=<?php echo $producto['id']; ?>" onclick="return confirm('¿Eliminar este producto?')" class="flex-1 bg-red-600 text-white text-center py-2 px-3 rounded font-semibold hover:bg-red-700 transition duration-300 text-sm">
+                            <i class="fas fa-trash mr-1"></i>Eliminar
+                        </a>
+                    </div>
                 </div>
             <?php endforeach; ?>
         <?php else: ?>

@@ -1,0 +1,157 @@
+/* Estilos para Ingresos y Egresos */
+
+.form-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.tab-button.active {
+    background: rgba(255, 255, 255, 0.3) !important;
+    border-bottom: 3px solid #FFD700;
+}
+
+.tab-content.hidden {
+    display: none;
+}
+
+.form-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.form-input {
+    transition: all 0.3s ease;
+    background-color: #f9f9f9 !important;
+    color: #333 !important;
+    border: 2px solid #ddd !important;
+}
+
+.form-input::placeholder {
+    color: #999 !important;
+    opacity: 1;
+}
+
+.form-input:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3) !important;
+    color: #333 !important;
+    background-color: #ffffff !important;
+    border-color: #667eea !important;
+}
+
+select.form-input {
+    color: #333 !important;
+}
+
+select.form-input option {
+    background-color: white;
+    color: #333;
+}
+
+textarea.form-input {
+    color: #333 !important;
+    background-color: #f9f9f9 !important;
+}
+
+textarea.form-input::placeholder {
+    color: #999 !important;
+}
+
+.submit-btn {
+    background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.submit-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.submit-btn:hover::after {
+    width: 300px;
+    height: 300px;
+}
+
+/* Animación de arena cayendo (para egresos) */
+.sand-particle {
+    position: fixed;
+    width: 4px;
+    height: 4px;
+    background: #D4A574;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    box-shadow: 0 0 3px rgba(212, 165, 116, 0.5);
+}
+
+@keyframes sandfall {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(var(--fall-distance)) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Animación de avión de papel (para ingresos) */
+.paper-plane {
+    position: fixed;
+    width: 40px;
+    height: 40px;
+    pointer-events: none;
+    z-index: 9999;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+@keyframes planefly {
+    0% {
+        transform: translate(0, 0) rotate(-15deg);
+        opacity: 1;
+    }
+    50% {
+        transform: translate(var(--mid-x), var(--mid-y)) rotate(-5deg) scale(1.2);
+    }
+    100% {
+        transform: translate(var(--end-x), var(--end-y)) rotate(5deg) scale(0.8);
+        opacity: 0;
+    }
+}
+
+/* Efecto de pulso en la gráfica */
+@keyframes chartPulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 0 20px 10px rgba(102, 126, 234, 0);
+    }
+}
+
+.chart-pulse {
+    animation: chartPulse 1.5s ease-in-out;
+}

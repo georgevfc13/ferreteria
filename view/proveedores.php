@@ -92,7 +92,7 @@ include '../template/header.php';
             <?php foreach ($proveedores as $prov): ?>
                 <div class="flex justify-between items-center bg-white p-4 rounded-lg shadow">
                     <div>
-                        <p class="font-semibold"><?php echo htmlspecialchars($prov['nombre']); ?> - <?php echo htmlspecialchars($prov['contacto']); ?></p>
+                        <p class="font-semibold text-dark"><?php echo htmlspecialchars($prov['nombre']); ?> - <?php echo htmlspecialchars($prov['contacto']); ?></p>
                         <p class="text-sm text-gray-600"><?php echo htmlspecialchars($prov['telefono']); ?> | <?php echo htmlspecialchars($prov['email']); ?></p>
                     </div>
                     <button onclick="openDeleteModal(<?php echo $prov['id']; ?>, '<?php echo addslashes($prov['nombre']); ?>')" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300">Eliminar</button>

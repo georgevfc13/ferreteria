@@ -4,16 +4,29 @@ include '../conexion.php';
 // Función para obtener datos de ventas del día
 function getVentasDelDia() {
     global $conn;
-    $sql = "SELECT SUM(total) as total_ventas, COUNT(*) as num_transacciones FROM ventas WHERE DATE(fecha) = CURDATE()";
+    $sql = "SELECT 
+            COALESCE(SUM(total), 0) as total_ventas, 
+            COUNT(*) as num_transacciones 
+            FROM ventas 
+            WHERE DATE(fecha) = CURDATE()";
     $result = $conn->query($sql);
     return $result->fetch_assoc();
 }
 
-// Función para obtener productos más vendidos
+// Función para obtener productos más vendidos (histórico)
 function getProductosMasVendidos($limit = 5) {
     global $conn;
-    $sql = "SELECT p.nombre, SUM(dv.cantidad) as total_vendido FROM productos p JOIN detalle_ventas dv ON p.id = dv.id_producto GROUP BY p.id ORDER BY total_vendido DESC LIMIT $limit";
-    $result = $conn->query($sql);
+    $sql = "SELECT p.nombre, COALESCE(SUM(dv.cantidad), 0) as total_vendido 
+            FROM productos p 
+            LEFT JOIN detalle_ventas dv ON p.id = dv.id_producto 
+            WHERE p.activo = 1 
+            GROUP BY p.id 
+            ORDER BY total_vendido DESC 
+            LIMIT ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $limit);
+    $stmt->execute();
+    $result = $stmt->get_result();
     return $result->fetch_all(MYSQLI_ASSOC);
 }
 

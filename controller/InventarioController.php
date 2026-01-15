@@ -47,4 +47,33 @@ function ocultarProducto($id) {
     $stmt->bind_param("i", $id);
     return $stmt->execute();
 }
+
+// Función para editar producto
+function editarProducto($id, $nombre, $descripcion, $stock, $precio_compra, $precio_venta, $id_proveedor) {
+    global $conn;
+    $sql = "UPDATE productos SET nombre = ?, descripcion = ?, stock = ?, precio_compra = ?, precio_venta = ?, id_proveedor = ? WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ssiddi", $nombre, $descripcion, $stock, $precio_compra, $precio_venta, $id_proveedor, $id);
+    return $stmt->execute();
+}
+
+// Función para obtener un producto por ID
+function getProductoById($id) {
+    global $conn;
+    $sql = "SELECT * FROM productos WHERE id = ? AND activo = 1";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
+// Función para obtener productos con bajo stock
+function getProductosBajoStock($umbral = 10) {
+    global $conn;
+    $sql = "SELECT * FROM productos WHERE stock <= ? AND activo = 1 ORDER BY stock ASC";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $umbral);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
 ?>

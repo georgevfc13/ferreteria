@@ -62,7 +62,21 @@ CREATE TABLE ingresos_egresos (
     descripcion TEXT,
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     categoria VARCHAR(50), -- Ej: venta, compra, gasto operativo, etc.
+    metodo_pago VARCHAR(50) DEFAULT 'efectivo', -- efectivo, tarjeta, cheque, etc.
     activo TINYINT(1) DEFAULT 1 -- Para ocultar en lugar de eliminar
+);
+
+-- Tabla de arqueos de caja
+-- Registra los cierre de caja diarios
+CREATE TABLE arqueos_caja (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    fecha DATE NOT NULL,
+    saldo_sistema DECIMAL(10,2) NOT NULL,
+    saldo_real DECIMAL(10,2) NOT NULL,
+    diferencia DECIMAL(10,2) NOT NULL,
+    tipo_diferencia ENUM('faltante', 'sobrante') NOT NULL,
+    observaciones TEXT,
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Insertar datos de ejemplo
