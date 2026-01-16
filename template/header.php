@@ -33,7 +33,7 @@
                     <!-- Logo y Nombre -->
                     <div class="flex-shrink-0 flex items-center space-x-2">
                         <i class="fas fa-tools text-accent text-2xl"></i>
-                        <span class="text-xl font-bold text-accent">Ferretería JJ</span>
+                        <span class="text-xl font-bold text-accent">Ferretería 2J</span>
                     </div>
                 </div>
                 <!-- Menú Desktop -->
