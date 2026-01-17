@@ -15,7 +15,12 @@ include '../template/header.php';
 <!-- Hero Section -->
 <section class="bg-gradient-to-r from-primary to-secondary bg-opacity-70 text-accent py-20">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h1 class="text-4xl md:text-6xl font-bold mb-4">Bienvenido a Ferretería JJ</h1>
+        <div class="flex justify-center items-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 flex items-center gap-4">
+                Bienvenido a Ferretería
+                <img src="../img/logo.png" alt="" class="h-40 w-30">
+            </h1>
+        </div>
         <p class="text-xl md:text-2xl mb-8">Software echo por mi</p>
         <a href="#dashboard" class="bg-accent text-secondary px-8 py-3 rounded-full font-semibold text-lg hover:bg-dark hover:text-accent transition duration-300 transform hover:scale-105">Ver Dashboard</a>
     </div>
