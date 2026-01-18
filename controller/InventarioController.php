@@ -1,10 +1,19 @@
 <?php
 include '../conexion.php';
 
-// Función para obtener productos con filtros
+// Función para obtener productos con filtros - CORREGIDA PARA SIEMPRE INCLUIR VENDIDOS
 function getProductos($filtro = 'default') {
     global $conn;
-    $sql = "SELECT p.*, pr.nombre as proveedor_nombre FROM productos p LEFT JOIN proveedores pr ON p.id_proveedor = pr.id WHERE p.activo = 1";
+    
+    // Base SQL que SIEMPRE incluye el campo vendido
+    $sql = "SELECT p.*, 
+            pr.nombre as proveedor_nombre, 
+            COALESCE(SUM(dv.cantidad), 0) as vendido 
+            FROM productos p 
+            LEFT JOIN proveedores pr ON p.id_proveedor = pr.id 
+            LEFT JOIN detalle_ventas dv ON p.id = dv.id_producto 
+            WHERE p.activo = 1 
+            GROUP BY p.id";
 
     switch ($filtro) {
         case 'mas-stock':
@@ -14,10 +23,10 @@ function getProductos($filtro = 'default') {
             $sql .= " ORDER BY p.stock ASC";
             break;
         case 'mas-vendido':
-            $sql = "SELECT p.*, pr.nombre as proveedor_nombre, COALESCE(SUM(dv.cantidad), 0) as vendido FROM productos p LEFT JOIN proveedores pr ON p.id_proveedor = pr.id LEFT JOIN detalle_ventas dv ON p.id = dv.id_producto WHERE p.activo = 1 GROUP BY p.id ORDER BY vendido DESC";
+            $sql .= " ORDER BY vendido DESC";
             break;
         case 'menos-vendido':
-            $sql = "SELECT p.*, pr.nombre as proveedor_nombre, COALESCE(SUM(dv.cantidad), 0) as vendido FROM productos p LEFT JOIN proveedores pr ON p.id_proveedor = pr.id LEFT JOIN detalle_ventas dv ON p.id = dv.id_producto WHERE p.activo = 1 GROUP BY p.id ORDER BY vendido ASC";
+            $sql .= " ORDER BY vendido ASC";
             break;
         case 'mayor-ganancia':
             $sql .= " ORDER BY (p.precio_venta - p.precio_compra) DESC";
@@ -48,12 +57,13 @@ function ocultarProducto($id) {
     return $stmt->execute();
 }
 
-// Función para editar producto
+// Función para editar producto - CORREGIDA
 function editarProducto($id, $nombre, $descripcion, $stock, $precio_compra, $precio_venta, $id_proveedor) {
     global $conn;
     $sql = "UPDATE productos SET nombre = ?, descripcion = ?, stock = ?, precio_compra = ?, precio_venta = ?, id_proveedor = ? WHERE id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssiddi", $nombre, $descripcion, $stock, $precio_compra, $precio_venta, $id_proveedor, $id);
+    // 7 parámetros: s=string, s=string, i=integer, d=decimal, d=decimal, i=integer, i=integer
+    $stmt->bind_param("ssiidii", $nombre, $descripcion, $stock, $precio_compra, $precio_venta, $id_proveedor, $id);
     return $stmt->execute();
 }
 

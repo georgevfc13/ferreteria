@@ -39,12 +39,12 @@ include '../template/header.php';
                 <div>
                     <label for="nombre" class="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
                     <input type="text" name="nombre" id="nombre" value="<?php echo htmlspecialchars($producto['nombre']); ?>" required 
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-black">
                 </div>
 
                 <div>
                     <label for="id_proveedor" class="block text-sm font-medium text-gray-700 mb-2">Proveedor</label>
-                    <select name="id_proveedor" id="id_proveedor" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <select name="id_proveedor" id="id_proveedor" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-black">
                         <option value="">Sin proveedor</option>
                         <?php foreach ($proveedores as $prov): ?>
                             <option value="<?php echo $prov['id']; ?>" <?php echo $producto['id_proveedor'] == $prov['id'] ? 'selected' : ''; ?>>
@@ -57,26 +57,26 @@ include '../template/header.php';
                 <div>
                     <label for="stock" class="block text-sm font-medium text-gray-700 mb-2">Stock</label>
                     <input type="number" name="stock" id="stock" value="<?php echo $producto['stock']; ?>" required 
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-black">
                 </div>
 
                 <div>
                     <label for="precio_compra" class="block text-sm font-medium text-gray-700 mb-2">Precio Compra</label>
                     <input type="number" step="0.01" name="precio_compra" id="precio_compra" value="<?php echo $producto['precio_compra']; ?>" required 
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-black">
                 </div>
 
                 <div>
                     <label for="precio_venta" class="block text-sm font-medium text-gray-700 mb-2">Precio Venta</label>
                     <input type="number" step="0.01" name="precio_venta" id="precio_venta" value="<?php echo $producto['precio_venta']; ?>" required 
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-black">
                 </div>
             </div>
 
             <div>
                 <label for="descripcion" class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
                 <textarea name="descripcion" id="descripcion" rows="4" 
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"><?php echo htmlspecialchars($producto['descripcion']); ?></textarea>
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-black"><?php echo htmlspecialchars($producto['descripcion']); ?></textarea>
             </div>
 
             <div class="flex gap-4">

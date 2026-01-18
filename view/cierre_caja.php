@@ -53,16 +53,95 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cierre_caja'])) {
 include '../template/header.php';
 ?>
 
+<style>
+@media print {
+    /* Ocultar elementos de navegación y footer al imprimir */
+    header, footer, nav, .no-print {
+        display: none !important;
+    }
+    
+    /* Ocultar elementos que no deben imprimirse */
+    .print-hide {
+        display: none !important;
+    }
+    
+    /* Ocultar todo excepto el histórico */
+    .grid, .print-header + div:not(.bg-white.rounded-lg.shadow-lg:last-of-type) {
+        display: none !important;
+    }
+    
+    /* Ajustar el contenedor principal */
+    body {
+        margin: 0;
+        padding: 20px;
+    }
+    
+    /* Forzar colores en impresión */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    /* Estilo para el encabezado de impresión */
+    .print-header {
+        border-bottom: 3px solid #2563eb;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    
+    /* Hacer la tabla más compacta en impresión */
+    table th, table td {
+        padding: 8px 12px !important;
+        font-size: 11px !important;
+    }
+    
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    
+    table th {
+        background-color: #374151 !important;
+        color: white !important;
+    }
+    
+    table td {
+        border: 1px solid #e5e7eb;
+    }
+    
+    /* Evitar saltos de página dentro de elementos */
+    .grid > div {
+        page-break-inside: avoid;
+    }
+    
+    /* Título para la tabla en impresión */
+    section::before {
+        content: "Histórico de Cierres de Caja";
+        display: block;
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+        color: #1f2937;
+    }
+}
+</style>
+
 <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <h1 class="text-4xl font-bold mb-8 text-center text-dark">Cierre de Caja</h1>
+    <div class="print-header print-hide">
+        <h1 class="text-4xl font-bold mb-4 text-center text-dark">Cierre de Caja</h1>
+        <p class="text-sm text-gray-500">Fecha: <?php echo date('d/m/Y'); ?></p>
+        <p class="text-xs text-gray-400 print-hide">Impresión: <?php echo date('d/m/Y H:i'); ?></p>
+    </div>
 
     <?php if ($mensaje): ?>
-        <div class="mb-6 p-4 rounded-lg <?php echo $tipo_mensaje === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
+        <div class="mb-6 p-4 rounded-lg <?php echo $tipo_mensaje === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?> print-hide">
             <?php echo htmlspecialchars($mensaje); ?>
         </div>
     <?php endif; ?>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 print-hide">
         <!-- Saldo en Sistema -->
         <div class="bg-white rounded-lg shadow-lg p-6 border-l-4 border-blue-600">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Saldo en Sistema</h2>
@@ -83,7 +162,7 @@ include '../template/header.php';
         </div>
 
         <!-- Formulario de Saldo Real -->
-        <div class="bg-white rounded-lg shadow-lg p-6 border-l-4 border-orange-600">
+        <div class="bg-white rounded-lg shadow-lg p-6 border-l-4 border-orange-600 print-hide">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Saldo Físico Contado</h2>
             <form method="POST" class="space-y-4">
                 <div>
@@ -125,7 +204,7 @@ include '../template/header.php';
 
     <!-- Comparativa de Saldos (si se envió el formulario) -->
     <?php if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cierre_caja'])): ?>
-        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8 print-hide">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Comparativa de Saldos</h2>
             
             <?php 
@@ -155,13 +234,22 @@ include '../template/header.php';
 
             <div class="mt-4 text-center">
                 <?php if ($diferencia == 0): ?>
-                    <p class="text-green-600 text-lg font-bold">✓ Caja Cuadrada</p>
+                    <div class="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg">
+                        <p class="text-lg font-bold">✓ COMPLETO - Caja Cuadrada</p>
+                    </div>
                 <?php else: ?>
                     <p class="text-<?php echo $tipo_diferencia === 'sobrante' ? 'green' : 'red'; ?>-600 text-lg font-bold">
                         <?php echo ucfirst($tipo_diferencia); ?> de $<?php echo number_format($diferencia, 2); ?>
                     </p>
                 <?php endif; ?>
             </div>
+            
+            <?php if (!empty($_POST['observaciones'])): ?>
+            <div class="mt-4 p-3 bg-gray-50 rounded border-l-4 border-gray-400">
+                <p class="text-sm text-gray-600"><strong>Observaciones:</strong></p>
+                <p class="text-gray-700"><?php echo htmlspecialchars($_POST['observaciones']); ?></p>
+            </div>
+            <?php endif; ?>
         </div>
     <?php endif; ?>
 
@@ -184,6 +272,7 @@ include '../template/header.php';
                             <th class="px-4 py-2 text-right text-dark">Saldo Real</th>
                             <th class="px-4 py-2 text-right text-dark">Diferencia</th>
                             <th class="px-4 py-2 text-left text-dark">Tipo</th>
+                            <th class="px-4 py-2 text-center text-dark print-hide">Observaciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -194,9 +283,25 @@ include '../template/header.php';
                                 <td class="px-4 py-3 text-right text-dark">$<?php echo number_format($arqueo['saldo_real'], 2); ?></td>
                                 <td class="px-4 py-3 text-right font-bold text-dark">$<?php echo number_format($arqueo['diferencia'], 2); ?></td>
                                 <td class="px-4 py-3">
-                                    <span class="px-3 py-1 rounded-full text-sm font-bold <?php echo $arqueo['tipo_diferencia'] === 'sobrante' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
-                                        <?php echo ucfirst($arqueo['tipo_diferencia']); ?>
-                                    </span>
+                                    <?php if ($arqueo['diferencia'] == 0): ?>
+                                        <span class="px-3 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-800">
+                                            Completo
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="px-3 py-1 rounded-full text-sm font-bold <?php echo $arqueo['tipo_diferencia'] === 'sobrante' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
+                                            <?php echo ucfirst($arqueo['tipo_diferencia']); ?>
+                                        </span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="px-4 py-3 text-center print-hide">
+                                    <?php if (!empty($arqueo['observaciones'])): ?>
+                                        <button onclick="mostrarObservaciones('<?php echo addslashes($arqueo['observaciones']); ?>', '<?php echo date('d/m/Y', strtotime($arqueo['fecha'])); ?>')" 
+                                                class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition duration-300 text-sm">
+                                            <i class="fas fa-eye mr-1"></i>Ver
+                                        </button>
+                                    <?php else: ?>
+                                        <span class="text-gray-400 text-sm">Sin observaciones</span>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         <?php endwhile; ?>
@@ -208,12 +313,67 @@ include '../template/header.php';
         <?php endif; ?>
     </div>
 
-    <div class="mt-8">
+    <div class="mt-8 flex gap-4 print-hide">
         <a href="home.php" class="inline-block bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition duration-300">
             <i class="fas fa-arrow-left mr-2"></i>Volver a Inicio
         </a>
+        
+        <button onclick="window.print()" class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition duration-300">
+            <i class="fas fa-print mr-2"></i>Imprimir Cierre de Caja
+        </button>
     </div>
 </section>
+
+<!-- Modal para mostrar observaciones -->
+<div id="modalObservaciones" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50 print-hide">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900" id="modalTitulo">Observaciones del Cierre</h3>
+                <button onclick="cerrarModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="mt-2 px-7 py-3">
+                <p class="text-sm text-gray-600 mb-2">Fecha: <strong id="modalFecha"></strong></p>
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <p class="text-sm text-gray-700" id="modalContenido"></p>
+                </div>
+            </div>
+            <div class="flex items-center justify-center px-4 py-3 mt-4">
+                <button onclick="cerrarModal()" class="px-6 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function mostrarObservaciones(observaciones, fecha) {
+    document.getElementById('modalFecha').textContent = fecha;
+    document.getElementById('modalContenido').textContent = observaciones;
+    document.getElementById('modalObservaciones').classList.remove('hidden');
+}
+
+function cerrarModal() {
+    document.getElementById('modalObservaciones').classList.add('hidden');
+}
+
+// Cerrar modal al hacer clic fuera de él
+document.getElementById('modalObservaciones')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        cerrarModal();
+    }
+});
+
+// Cerrar modal con tecla ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        cerrarModal();
+    }
+});
+</script>
 
 <?php
 $stmt_ing->close();

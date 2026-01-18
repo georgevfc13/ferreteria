@@ -16,8 +16,8 @@
                 </div>
                 <div>
                     <h3 class="text-lg font-semibold mb-4">Contacto</h3>
-                    <p class="text-gray-300"><i class="fas fa-phone mr-2"></i>+57 123456</p>
-                    <p class="text-gray-300"><i class="fas fa-envelope mr-2"></i>ferreteriajj@gmail.com</p>
+                    <p class="text-gray-300"><i class="fas fa-phone mr-2"></i>+57 3204975608</p>
+                    <p class="text-gray-300"><i class="fas fa-envelope mr-2"></i>Casjup_04@hotmail.com</p>
                 </div>
             </div>
             <div class="border-t border-gray-600 mt-8 pt-6 text-center">
