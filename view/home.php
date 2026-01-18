@@ -21,7 +21,7 @@ include '../template/header.php';
                 <img src="../img/logo.png" alt="" class="h-40 w-30">
             </h1>
         </div>
-        <p class="text-xl md:text-2xl mb-8">Software echo por mi</p>
+        <p class="text-xl md:text-2xl mb-8">Pagina para ayudar a controlar el inventario y ingresos - egresos de la ferreteria</p>
         <a href="#dashboard" class="bg-accent text-secondary px-8 py-3 rounded-full font-semibold text-lg hover:bg-dark hover:text-accent transition duration-300 transform hover:scale-105">Ver Dashboard</a>
     </div>
 </section>
