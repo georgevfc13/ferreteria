@@ -1,107 +1,122 @@
 <?php
-include '../conexion.php';
+// ============================================
+// CONTROLLER: Ingresos y Egresos
+// Orquesta: entrada del usuario -> model -> vista
+// ============================================
 
-// Función para obtener ingresos y egresos detallados semanales
-function getIngresosEgresosSemanales() {
-    global $conn;
-    $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-    $data = [];
+// Cargar los modelos
+include '../model/IngresoEgresoModel.php';
+include '../model/ProductoModel.php';
+include '../model/ProveedorModel.php';
 
-    for ($i = 6; $i >= 0; $i--) {
-        $fecha = date('Y-m-d', strtotime("-$i days"));
-        $dia = $dias[6 - $i];
+// Variables iniciales
+$pageTitle = 'Ingresos y Egresos';
+$pageCSS = ['../css/ingresos_egresos.css'];
+$error = null;
+$success = null;
 
-        $sql_ing = "SELECT COALESCE(SUM(monto), 0) as total FROM ingresos_egresos WHERE tipo = 'ingreso' AND DATE(fecha) = '$fecha' AND activo = 1";
-        $result_ing = $conn->query($sql_ing);
-        $ingresos = floatval($result_ing->fetch_assoc()['total'] ?? 0);
+// 1. PROCESAR ENTRADA DEL USUARIO (POST)
+// ========================================
 
-        $sql_egr = "SELECT COALESCE(SUM(monto), 0) as total FROM ingresos_egresos WHERE tipo = 'egreso' AND DATE(fecha) = '$fecha' AND activo = 1";
-        $result_egr = $conn->query($sql_egr);
-        $egresos = floatval($result_egr->fetch_assoc()['total'] ?? 0);
-
-        $data[] = [
-            'dia' => $dia,
-            'ingresos' => $ingresos,
-            'egresos' => $egresos,
-            'neto' => $ingresos - $egresos
-        ];
-    }
-
-    return $data;
-}
-
-// Función para obtener todos los ingresos/egresos activos
-function getAllIngresosEgresos() {
-    global $conn;
-    $sql = "SELECT * FROM ingresos_egresos WHERE activo = 1 ORDER BY fecha DESC";
-    $result = $conn->query($sql);
-    return $result->fetch_all(MYSQLI_ASSOC);
-}
-
-// Función para insertar nuevo ingreso/egreso con venta
-function insertIngresoEgreso($tipo, $monto, $descripcion, $categoria, $id_producto = null, $cantidad = null) {
-    global $conn;
-    $monto = floatval($monto);
-    $metodo_pago = 'efectivo'; // Por defecto
+// Agregar ingreso/egreso
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['agregar'])) {
+    $tipo = $_POST['tipo'] ?? '';
     
-    // Si es una venta, primero insertar en tabla ventas
-    $venta_id = null;
-    if ($tipo === 'ingreso' && $id_producto && $cantidad) {
-        $cliente = "Cliente";
-        $total = $monto;
-        $sql_venta_principal = "INSERT INTO ventas (total, cliente) VALUES (?, ?)";
-        $stmt_venta_principal = $conn->prepare($sql_venta_principal);
-        $stmt_venta_principal->bind_param("ds", $total, $cliente);
-        $stmt_venta_principal->execute();
-        $venta_id = $conn->insert_id;
-    }
-    
-    // Insertar en ingresos_egresos
-    $sql = "INSERT INTO ingresos_egresos (tipo, monto, descripcion, categoria, metodo_pago) VALUES (?, ?, ?, ?, ?)";
-    $stmt = $conn->prepare($sql);
-    if (!$stmt) {
-        error_log("Error preparing statement: " . $conn->error);
-        return false;
-    }
-    $stmt->bind_param("sdsss", $tipo, $monto, $descripcion, $categoria, $metodo_pago);
-    $result = $stmt->execute();
-    
-    if (!$result) {
-        error_log("Error executing statement: " . $stmt->error);
-        return false;
-    }
-    
-    // Si es una venta, registrar en detalle_ventas y actualizar stock
-    if ($tipo === 'ingreso' && $venta_id && $id_producto && $cantidad) {
-        $precio_unitario = $monto / $cantidad;
-        $subtotal = $monto;
+    if ($tipo === 'ingreso') {
+        // Procesar ingreso de ventas
+        $cantidad = (int)($_POST['cantidad'] ?? 0);
+        $id_producto = (int)($_POST['id_producto'] ?? 0);
         
-        // Registrar en detalle_ventas con el venta_id correcto
-        $sql_venta_detalle = "INSERT INTO detalle_ventas (id_venta, id_producto, cantidad, precio_unitario, subtotal) VALUES (?, ?, ?, ?, ?)";
-        $stmt_venta_detalle = $conn->prepare($sql_venta_detalle);
-        $stmt_venta_detalle->bind_param("iiidd", $venta_id, $id_producto, $cantidad, $precio_unitario, $subtotal);
-        if (!$stmt_venta_detalle->execute()) {
-            error_log("Error inserting detalle_ventas: " . $stmt_venta_detalle->error);
+        if (!empty($tipo) && $cantidad > 0 && $id_producto > 0) {
+            // Obtener el precio del producto
+            $productos_temp = getProductos('default');
+            $precio_venta = 0;
+            $nombre_producto = '';
+            
+            foreach ($productos_temp as $p) {
+                if ($p['id'] == $id_producto) {
+                    $precio_venta = $p['precio_venta'];
+                    $nombre_producto = $p['nombre'];
+                    break;
+                }
+            }
+            
+            if ($precio_venta > 0) {
+                $monto = $cantidad * $precio_venta;
+                $descripcion = $nombre_producto;
+                $categoria = $nombre_producto;
+                
+                if (insertIngresoEgreso($tipo, $monto, $descripcion, $categoria, $id_producto, $cantidad)) {
+                    header("Location: ingresos_egresos.php");
+                    exit();
+                } else {
+                    $error = "Error al registrar el ingreso";
+                }
+            }
         }
+    } elseif ($tipo === 'egreso') {
+        // Procesar egreso de compra a proveedores
+        $monto = (float)($_POST['monto'] ?? 0);
+        $id_proveedor = (int)($_POST['id_proveedor'] ?? 0);
+        $detalle = $_POST['detalle'] ?? '';
         
-        // Actualizar stock del producto
-        $sql_stock = "UPDATE productos SET stock = stock - ? WHERE id = ?";
-        $stmt_stock = $conn->prepare($sql_stock);
-        $stmt_stock->bind_param("ii", $cantidad, $id_producto);
-        if (!$stmt_stock->execute()) {
-            error_log("Error updating stock: " . $stmt_stock->error);
+        if (!empty($tipo) && $monto > 0 && $id_proveedor > 0) {
+            // Obtener el nombre del proveedor
+            $proveedores_temp = getProveedores();
+            $nombre_proveedor = '';
+            
+            foreach ($proveedores_temp as $prov) {
+                if ($prov['id'] == $id_proveedor) {
+                    $nombre_proveedor = $prov['nombre'];
+                    break;
+                }
+            }
+            
+            if (!empty($nombre_proveedor)) {
+                $descripcion = "Compra a " . $nombre_proveedor . (!empty($detalle) ? " - " . $detalle : '');
+                $categoria = $nombre_proveedor;
+                
+                if (insertIngresoEgreso($tipo, $monto, $descripcion, $categoria)) {
+                    header("Location: ingresos_egresos.php");
+                    exit();
+                } else {
+                    $error = "Error al registrar el egreso";
+                }
+            }
         }
     }
-    
-    return $result;
 }
 
-// Función para "eliminar" (ocultar) ingreso/egreso
-function ocultarIngresoEgreso($id) {
-    global $conn;
-    $sql = "UPDATE ingresos_egresos SET activo = 0 WHERE id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $id);
-    return $stmt->execute();
+// Eliminar ingreso/egreso
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['eliminar'])) {
+    $id = (int)($_POST['id'] ?? 0);
+    $codigo = $_POST['codigo'] ?? '';
+    $codigo_correcto = str_pad($id, 6, '0', STR_PAD_LEFT);
+    
+    if ($codigo === $codigo_correcto && ocultarIngresoEgreso($id)) {
+        header("Location: ingresos_egresos.php");
+        exit();
+    } else {
+        $error = "Código de confirmación incorrecto";
+    }
 }
+
+// 2. OBTENER DATOS DEL MODELO
+// =============================
+$ingresos_egresos = getAllIngresosEgresos();
+$ingresos_egresos_semanales = getIngresosEgresosSemanales();
+$productos = getProductos();
+$proveedores = getProveedores();
+
+// Preparar datos para la gráfica
+$datos_grafica = [];
+foreach ($ingresos_egresos_semanales as $dia) {
+    $datos_grafica[] = [
+        'dia' => $dia['dia'],
+        'ingresos' => $dia['ingresos'],
+        'egresos' => $dia['egresos']
+    ];
+}
+
+// 3. LA VISTA SE CARGA A CONTINUACIÓN (en el archivo view)
 ?>

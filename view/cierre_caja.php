@@ -1,5 +1,6 @@
 <?php
 $pageTitle = 'Cierre de Caja';
+$pageCSS = ['../css/cierre_caja.css'];
 include '../conexion.php';
 
 // Obtener fecha actual
@@ -53,80 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cierre_caja'])) {
 include '../template/header.php';
 ?>
 
-<style>
-@media print {
-    /* Ocultar elementos de navegación y footer al imprimir */
-    header, footer, nav, .no-print {
-        display: none !important;
-    }
-    
-    /* Ocultar elementos que no deben imprimirse */
-    .print-hide {
-        display: none !important;
-    }
-    
-    /* Ocultar todo excepto el histórico */
-    .grid, .print-header + div:not(.bg-white.rounded-lg.shadow-lg:last-of-type) {
-        display: none !important;
-    }
-    
-    /* Ajustar el contenedor principal */
-    body {
-        margin: 0;
-        padding: 20px;
-    }
-    
-    /* Forzar colores en impresión */
-    * {
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-    }
-    
-    /* Estilo para el encabezado de impresión */
-    .print-header {
-        border-bottom: 3px solid #2563eb;
-        padding-bottom: 15px;
-        margin-bottom: 20px;
-        text-align: center;
-    }
-    
-    /* Hacer la tabla más compacta en impresión */
-    table th, table td {
-        padding: 8px 12px !important;
-        font-size: 11px !important;
-    }
-    
-    table {
-        border-collapse: collapse;
-        width: 100%;
-    }
-    
-    table th {
-        background-color: #374151 !important;
-        color: white !important;
-    }
-    
-    table td {
-        border: 1px solid #e5e7eb;
-    }
-    
-    /* Evitar saltos de página dentro de elementos */
-    .grid > div {
-        page-break-inside: avoid;
-    }
-    
-    /* Título para la tabla en impresión */
-    section::before {
-        content: "Histórico de Cierres de Caja";
-        display: block;
-        font-size: 24px;
-        font-weight: bold;
-        text-align: center;
-        margin-bottom: 20px;
-        color: #1f2937;
-    }
-}
-</style>
+<link rel="stylesheet" href="../css/cierre_caja.css">
 
 <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="print-header print-hide">
@@ -349,34 +277,10 @@ include '../template/header.php';
     </div>
 </div>
 
-<script>
-function mostrarObservaciones(observaciones, fecha) {
-    document.getElementById('modalFecha').textContent = fecha;
-    document.getElementById('modalContenido').textContent = observaciones;
-    document.getElementById('modalObservaciones').classList.remove('hidden');
-}
-
-function cerrarModal() {
-    document.getElementById('modalObservaciones').classList.add('hidden');
-}
-
-// Cerrar modal al hacer clic fuera de él
-document.getElementById('modalObservaciones')?.addEventListener('click', function(e) {
-    if (e.target === this) {
-        cerrarModal();
-    }
-});
-
-// Cerrar modal con tecla ESC
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        cerrarModal();
-    }
-});
-</script>
-
 <?php
 $stmt_ing->close();
 $stmt_egr->close();
 include '../template/footer.php';
 ?>
+
+<script src="../js/cierre_caja.js"></script>

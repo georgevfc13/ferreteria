@@ -1,5 +1,6 @@
 <?php
 $pageTitle = 'Inventario';
+$pageCSS = [];
 include '../controller/InventarioController.php';
 include '../controller/ProveedoresController.php';
 

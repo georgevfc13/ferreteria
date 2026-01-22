@@ -1,103 +1,7 @@
 <?php
 $pageTitle = 'Ingresos y Egresos';
+$pageCSS = ['../css/ingresos_egresos.css'];
 include '../controller/IngresosEgresosController.php';
-include '../controller/InventarioController.php';
-include '../controller/ProveedoresController.php';
-
-// Manejar POST para insertar
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['agregar'])) {
-    $tipo = isset($_POST['tipo']) ? $_POST['tipo'] : '';
-    
-    if ($tipo === 'ingreso') {
-        // Procesar ingreso de ventas
-        $cantidad = isset($_POST['cantidad']) ? $_POST['cantidad'] : 0;
-        $id_producto = isset($_POST['id_producto']) ? $_POST['id_producto'] : 0;
-        
-        if (!empty($tipo) && $cantidad > 0 && $id_producto > 0) {
-            // Obtener el precio del producto
-            $productos_temp = getProductos('default');
-            $precio_venta = 0;
-            $nombre_producto = '';
-            
-            foreach ($productos_temp as $p) {
-                if ($p['id'] == $id_producto) {
-                    $precio_venta = $p['precio_venta'];
-                    $nombre_producto = $p['nombre'];
-                    break;
-                }
-            }
-            
-            if ($precio_venta > 0) {
-                $monto = $cantidad * $precio_venta;
-                $descripcion = $nombre_producto;
-                $categoria = $nombre_producto;
-                
-                if (insertIngresoEgreso($tipo, $monto, $descripcion, $categoria, $id_producto, $cantidad)) {
-                    // Guardar en sesión para mostrar animación
-                    session_start();
-                    $_SESSION['mostrar_animacion'] = $tipo;
-                    header("Location: ingresos_egresos.php");
-                    exit();
-                } else {
-                    error_log("Error al insertar ingreso/egreso");
-                }
-            }
-        }
-    } elseif ($tipo === 'egreso') {
-        // Procesar egreso de compra a proveedores
-        $monto = isset($_POST['monto']) ? $_POST['monto'] : 0;
-        $id_proveedor = isset($_POST['id_proveedor']) ? $_POST['id_proveedor'] : 0;
-        $detalle = isset($_POST['detalle']) ? $_POST['detalle'] : '';
-        
-        if (!empty($tipo) && $monto > 0 && $id_proveedor > 0) {
-            // Obtener el nombre del proveedor
-            $proveedores_temp = getProveedores();
-            $nombre_proveedor = '';
-            
-            foreach ($proveedores_temp as $prov) {
-                if ($prov['id'] == $id_proveedor) {
-                    $nombre_proveedor = $prov['nombre'];
-                    break;
-                }
-            }
-            
-            if (!empty($nombre_proveedor)) {
-                $descripcion = "Compra a " . $nombre_proveedor . (!empty($detalle) ? " - " . $detalle : '');
-                $categoria = $nombre_proveedor;
-                
-                if (insertIngresoEgreso($tipo, $monto, $descripcion, $categoria)) {
-                    // Guardar en sesión para mostrar animación
-                    session_start();
-                    $_SESSION['mostrar_animacion'] = $tipo;
-                    header("Location: ingresos_egresos.php");
-                    exit();
-                } else {
-                    error_log("Error al insertar ingreso/egreso");
-                }
-            }
-        }
-    }
-}
-
-// Manejar POST para eliminar
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['eliminar'])) {
-    $id = $_POST['id'];
-    $codigo = $_POST['codigo'];
-    $codigo_correcto = str_pad($id, 6, '0', STR_PAD_LEFT);
-    if ($codigo === $codigo_correcto) {
-        ocultarIngresoEgreso($id);
-        header("Location: ingresos_egresos.php");
-        exit();
-    }
-}
-
-// Obtener datos después de procesar los POST
-$datosSemanales = getIngresosEgresosSemanales();
-$todos = getAllIngresosEgresos();
-$productos = getProductos('default');
-
-// Obtener proveedores
-$proveedores = getProveedores();
 
 include '../template/header.php';
 ?>
@@ -108,7 +12,7 @@ include '../template/header.php';
     <!-- Gráfica Detallada -->
     <div id="chartContainer" class="bg-gray-50 rounded-xl shadow-md p-8 mb-8">
         <h2 class="text-2xl font-semibold text-dark mb-6 text-center">Reporte Detallado Semanal</h2>
-        <canvas id="detailedChart" width="400" height="200"></canvas>
+        <canvas id="detailedChart" width="400" height="200" data-dias="<?php echo htmlspecialchars(json_encode(array_column($ingresos_egresos_semanales, 'dia'))); ?>" data-ingresos="<?php echo htmlspecialchars(json_encode(array_map('floatval', array_column($ingresos_egresos_semanales, 'ingresos')))); ?>" data-egresos="<?php echo htmlspecialchars(json_encode(array_map('floatval', array_column($ingresos_egresos_semanales, 'egresos')))); ?>"></canvas>
     </div>
 
     <!-- Tabla de Detalles -->
@@ -125,7 +29,7 @@ include '../template/header.php';
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
-                    <?php foreach ($datosSemanales as $dato): ?>
+                    <?php foreach ($ingresos_egresos_semanales as $dato): ?>
                         <tr class="hover:bg-gray-100">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><?php echo $dato['dia']; ?></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$<?php echo number_format($dato['ingresos'], 2); ?></td>
@@ -155,6 +59,7 @@ include '../template/header.php';
             <h2 class="text-2xl font-semibold text-white mb-6 text-center">✨ Agregar Nuevo Ingreso</h2>
             <form method="POST" id="movementFormIngreso" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <input type="hidden" name="tipo" value="ingreso">
+                <input type="hidden" name="agregar" value="1">
                 
                 <div class="group md:col-span-2">
                     <label for="id_producto" class="block text-sm font-medium text-white mb-2 transition-all group-hover:text-yellow-200">
@@ -185,7 +90,7 @@ include '../template/header.php';
                 </div>
                 
                 <div class="md:col-span-2">
-                    <button type="submit" name="agregar" class="submit-btn relative w-full text-white font-bold py-4 px-6 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+                    <button type="submit" class="submit-btn relative w-full text-white font-bold py-4 px-6 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
                         <span class="relative z-10 text-lg">🚀 Agregar Ingreso</span>
                     </button>
                 </div>
@@ -197,6 +102,7 @@ include '../template/header.php';
             <h2 class="text-2xl font-semibold text-white mb-6 text-center">✨ Agregar Nuevo Egreso</h2>
             <form method="POST" id="movementFormEgreso" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <input type="hidden" name="tipo" value="egreso">
+                <input type="hidden" name="agregar" value="1">
                 
                 <div class="group md:col-span-2">
                     <label for="id_proveedor" class="block text-sm font-medium text-white mb-2 transition-all group-hover:text-yellow-200">
@@ -239,15 +145,19 @@ include '../template/header.php';
     <div class="bg-gray-50 rounded-xl shadow-md p-8 mt-8">
         <h2 class="text-2xl font-semibold text-dark mb-6 text-center">Lista de Movimientos</h2>
         <div class="space-y-4">
-            <?php foreach ($todos as $mov): ?>
-                <div class="flex justify-between items-center bg-white p-4 rounded-lg shadow">
-                    <div>
-                        <p class="font-semibold text-dark"><?php echo ucfirst($mov['tipo']); ?>: $<?php echo number_format($mov['monto'], 2); ?> - <?php echo $mov['descripcion']; ?> (<?php echo $mov['categoria']; ?>)</p>
-                        <p class="text-sm text-green-800"><?php echo $mov['fecha']; ?></p>
+            <?php if (!empty($ingresos_egresos)): ?>
+                <?php foreach ($ingresos_egresos as $mov): ?>
+                    <div class="flex justify-between items-center bg-white p-4 rounded-lg shadow">
+                        <div>
+                            <p class="font-semibold text-dark"><?php echo ucfirst($mov['tipo']); ?>: $<?php echo number_format($mov['monto'], 2); ?> - <?php echo $mov['descripcion']; ?> (<?php echo $mov['categoria']; ?>)</p>
+                            <p class="text-sm text-green-800"><?php echo $mov['fecha']; ?></p>
+                        </div>
+                        <button onclick="openDeleteModal(<?php echo $mov['id']; ?>, '<?php echo addslashes($mov['descripcion']); ?>')" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300">Eliminar</button>
                     </div>
-                    <button onclick="openDeleteModal(<?php echo $mov['id']; ?>, '<?php echo addslashes($mov['descripcion']); ?>')" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300">Eliminar</button>
-                </div>
-            <?php endforeach; ?>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p class="text-center text-gray-500">No hay movimientos registrados</p>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -276,123 +186,8 @@ include '../template/header.php';
     </form>
 </main>
 
-<link rel="stylesheet" href="../css/ingresos_egresos.css">
-<script src="../js/ingresos_egresos.js"></script>
-
-<script>
-    // Cambiar entre tabs
-    function showTab(tabName) {
-        const tabs = document.querySelectorAll('.tab-content');
-        tabs.forEach(tab => tab.classList.add('hidden'));
-        
-        document.getElementById('tab-' + tabName).classList.remove('hidden');
-        
-        const buttons = document.querySelectorAll('.tab-button');
-        buttons.forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
-    }
-    
-    // Calcular monto total automáticamente para ingresos
-    const productoSelect = document.getElementById('id_producto');
-    const cantidadInput = document.getElementById('cantidad');
-    const montoTotalInput = document.getElementById('monto_total');
-    
-    function calcularMontoTotal() {
-        const selectedOption = productoSelect.options[productoSelect.selectedIndex];
-        const precio = parseFloat(selectedOption.dataset.precio) || 0;
-        const cantidad = parseInt(cantidadInput.value) || 0;
-        const total = precio * cantidad;
-        
-        montoTotalInput.value = total > 0 ? total.toFixed(2) : '0.00';
-    }
-    
-    if (productoSelect) {
-        productoSelect.addEventListener('change', calcularMontoTotal);
-    }
-    if (cantidadInput) {
-        cantidadInput.addEventListener('input', calcularMontoTotal);
-    }
-    
-    // Interceptar el envío del formulario para activar la animación
-    document.getElementById('movementFormIngreso').addEventListener('submit', function(e) {
-        createPaperPlaneEffect();
-    });
-    
-    document.getElementById('movementFormEgreso').addEventListener('submit', function(e) {
-        createSandEffect();
-    });
-    
-    function openDeleteModal(id, descripcion) {
-        document.getElementById('modalTitle').innerText = `Eliminar: ${descripcion}`;
-        const code = id.toString().padStart(6, '0');
-        document.getElementById('confirmationCode').innerText = `Código: ${code}`;
-        document.getElementById('deleteModal').classList.remove('hidden');
-        document.getElementById('deleteId').value = id;
-    }
-
-    document.getElementById('cancelBtn').addEventListener('click', function() {
-        document.getElementById('deleteModal').classList.add('hidden');
-        document.getElementById('codeInput').value = '';
-    });
-
-    document.getElementById('confirmBtn').addEventListener('click', function() {
-        const code = document.getElementById('codeInput').value;
-        document.getElementById('deleteCode').value = code;
-        document.getElementById('deleteForm').submit();
-    });
-
-    // Cargar datos de PHP y mostrar gráfica
-    const diasData = <?php echo json_encode(array_column($datosSemanales, 'dia')); ?>;
-    const ingresosData = <?php echo json_encode(array_map('floatval', array_column($datosSemanales, 'ingresos'))); ?>;
-    const egresosData = <?php echo json_encode(array_map('floatval', array_column($datosSemanales, 'egresos'))); ?>;
-    
-    // Esperar a que el DOM esté listo
-    setTimeout(function() {
-        const ctx = document.getElementById('detailedChart');
-        if (ctx) {
-            const detailedChart = new Chart(ctx.getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: diasData,
-                    datasets: [{
-                        label: 'Ingresos',
-                        data: ingresosData,
-                        backgroundColor: '#32CD32',
-                        borderColor: '#228B22',
-                        borderWidth: 1
-                    }, {
-                        label: 'Gastos',
-                        data: egresosData,
-                        backgroundColor: '#FFD700',
-                        borderColor: '#DAA520',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    indexAxis: 'x',
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return '$' + value.toFixed(2);
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-    }, 100);
-</script>
-
 <?php
 include '../template/footer.php';
 ?>
+
+<script src="../js/ingresos_egresos.js"></script>

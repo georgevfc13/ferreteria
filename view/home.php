@@ -1,5 +1,6 @@
 <?php
 $pageTitle = 'Inicio';
+$pageCSS = [];
 include '../controller/HomeController.php';
 
 // Obtener datos
@@ -85,46 +86,12 @@ include '../template/header.php';
     <!-- Reporte Semanal de Gastos e Ingresos (Gráfica) -->
     <div class="bg-white rounded-xl shadow-lg p-8 mb-10">
         <h3 class="text-2xl font-semibold text-dark mb-6 text-center">Reporte Semanal de Gastos e Ingresos</h3>
-        <canvas id="weeklyChart" width="400" height="200"></canvas>
+        <canvas id="weeklyChart" width="400" height="200" data-dias="<?php echo htmlspecialchars(json_encode($datosGrafica['dias'])); ?>" data-ingresos="<?php echo htmlspecialchars(json_encode($datosGrafica['ingresos'])); ?>" data-egresos="<?php echo htmlspecialchars(json_encode($datosGrafica['egresos'])); ?>"></canvas>
     </div>
 </main>
-
-<script>
-    // Gráfica semanal con Chart.js
-    const ctx = document.getElementById('weeklyChart').getContext('2d');
-    const weeklyChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: <?php echo json_encode($datosGrafica['dias']); ?>,
-            datasets: [{
-                label: 'Ingresos',
-                data: <?php echo json_encode($datosGrafica['ingresos']); ?>,
-                borderColor: '#32CD32',
-                backgroundColor: 'rgba(50, 205, 50, 0.1)',
-                tension: 0.4
-            }, {
-                label: 'Gastos',
-                data: <?php echo json_encode($datosGrafica['egresos']); ?>,
-                borderColor: '#FFD700',
-                backgroundColor: 'rgba(255, 215, 0, 0.1)',
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                },
-                title: {
-                    display: true,
-                    text: 'Ingresos vs Gastos Semanales'
-                }
-            }
-        }
-    });
-</script>
 
 <?php
 include '../template/footer.php';
 ?>
+
+<script src="../js/home.js"></script>

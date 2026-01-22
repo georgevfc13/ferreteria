@@ -1,29 +1,56 @@
 <?php
-include '../conexion.php';
+// ============================================
+// CONTROLLER: Proveedores
+// Orquesta: entrada del usuario -> model -> vista
+// ============================================
 
-// Función para obtener todos los proveedores
-function getProveedores() {
-    global $conn;
-    $sql = "SELECT * FROM proveedores WHERE activo = 1 ORDER BY nombre ASC";
-    $result = $conn->query($sql);
-    return $result->fetch_all(MYSQLI_ASSOC);
+// Cargar el modelo
+include '../model/ProveedorModel.php';
+
+// Variables iniciales
+$pageTitle = 'Nuestros Proveedores';
+$pageCSS = ['../css/proveedores.css'];
+$error = null;
+$success = null;
+
+// 1. PROCESAR ENTRADA DEL USUARIO (POST)
+// =========================================
+
+// Agregar nuevo proveedor
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['agregar'])) {
+    $nombre = $_POST['nombre'] ?? '';
+    $contacto = $_POST['contacto'] ?? '';
+    $telefono = $_POST['telefono'] ?? '';
+    $email = $_POST['email'] ?? '';
+    $direccion = $_POST['direccion'] ?? '';
+    
+    if (insertProveedor($nombre, $contacto, $telefono, $email, $direccion)) {
+        $success = "Proveedor agregado exitosamente";
+        header("Location: proveedores.php");
+        exit();
+    } else {
+        $error = "Error al agregar el proveedor";
+    }
 }
 
-// Función para insertar proveedor
-function insertProveedor($nombre, $contacto, $telefono, $email, $direccion) {
-    global $conn;
-    $sql = "INSERT INTO proveedores (nombre, contacto, telefono, email, direccion) VALUES (?, ?, ?, ?, ?)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssss", $nombre, $contacto, $telefono, $email, $direccion);
-    return $stmt->execute();
+// Eliminar proveedor
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['eliminar'])) {
+    $id = $_POST['id'] ?? null;
+    $codigo = $_POST['codigo'] ?? '';
+    $codigo_correcto = str_pad($id, 6, '0', STR_PAD_LEFT);
+    
+    if ($codigo === $codigo_correcto && ocultarProveedor($id)) {
+        $success = "Proveedor eliminado exitosamente";
+        header("Location: proveedores.php");
+        exit();
+    } else {
+        $error = "Código de confirmación incorrecto";
+    }
 }
 
-// Función para ocultar proveedor
-function ocultarProveedor($id) {
-    global $conn;
-    $sql = "UPDATE proveedores SET activo = 0 WHERE id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $id);
-    return $stmt->execute();
-}
+// 2. OBTENER DATOS DEL MODELO
+// =============================
+$proveedores = getProveedores();
+
+// 3. LA VISTA SE CARGA A CONTINUACIÓN (en el archivo view)
 ?>

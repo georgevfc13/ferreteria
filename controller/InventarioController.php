@@ -1,89 +1,79 @@
 <?php
-include '../conexion.php';
+// ============================================
+// CONTROLLER: Inventario
+// Orquesta: entrada del usuario -> model -> vista
+// ============================================
 
-// Función para obtener productos con filtros - CORREGIDA PARA SIEMPRE INCLUIR VENDIDOS
-function getProductos($filtro = 'default') {
-    global $conn;
+// Cargar los modelos
+include '../model/ProductoModel.php';
+include '../model/ProveedorModel.php';
+
+// Variables iniciales
+$pageTitle = 'Inventario de Productos';
+$pageCSS = ['../css/ingresos_egresos.css'];
+$error = null;
+$success = null;
+
+// 1. PROCESAR ENTRADA DEL USUARIO (POST/GET)
+// ============================================
+
+// Obtener filtro si existe
+$filtro = $_GET['filtro'] ?? 'default';
+
+// Agregar producto
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['agregar_producto'])) {
+    $nombre = $_POST['nombre'] ?? '';
+    $descripcion = $_POST['descripcion'] ?? '';
+    $stock = (int)($_POST['stock'] ?? 0);
+    $precio_compra = (float)($_POST['precio_compra'] ?? 0);
+    $precio_venta = (float)($_POST['precio_venta'] ?? 0);
+    $id_proveedor = (int)($_POST['id_proveedor'] ?? 0);
     
-    // Base SQL que SIEMPRE incluye el campo vendido
-    $sql = "SELECT p.*, 
-            pr.nombre as proveedor_nombre, 
-            COALESCE(SUM(dv.cantidad), 0) as vendido 
-            FROM productos p 
-            LEFT JOIN proveedores pr ON p.id_proveedor = pr.id 
-            LEFT JOIN detalle_ventas dv ON p.id = dv.id_producto 
-            WHERE p.activo = 1 
-            GROUP BY p.id";
-
-    switch ($filtro) {
-        case 'mas-stock':
-            $sql .= " ORDER BY p.stock DESC";
-            break;
-        case 'menos-stock':
-            $sql .= " ORDER BY p.stock ASC";
-            break;
-        case 'mas-vendido':
-            $sql .= " ORDER BY vendido DESC";
-            break;
-        case 'menos-vendido':
-            $sql .= " ORDER BY vendido ASC";
-            break;
-        case 'mayor-ganancia':
-            $sql .= " ORDER BY (p.precio_venta - p.precio_compra) DESC";
-            break;
-        default:
-            $sql .= " ORDER BY p.nombre ASC";
+    if (insertProducto($nombre, $descripcion, $stock, $precio_compra, $precio_venta, $id_proveedor)) {
+        $success = "Producto agregado exitosamente";
+        header("Location: inventario.php");
+        exit();
+    } else {
+        $error = "Error al agregar el producto";
     }
-
-    $result = $conn->query($sql);
-    return $result->fetch_all(MYSQLI_ASSOC);
 }
 
-// Función para insertar producto
-function insertProducto($nombre, $descripcion, $stock, $precio_compra, $precio_venta, $id_proveedor) {
-    global $conn;
-    $sql = "INSERT INTO productos (nombre, descripcion, stock, precio_compra, precio_venta, id_proveedor) VALUES (?, ?, ?, ?, ?, ?)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssiddi", $nombre, $descripcion, $stock, $precio_compra, $precio_venta, $id_proveedor);
-    return $stmt->execute();
+// Editar producto
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editar_producto'])) {
+    $id = (int)($_POST['id'] ?? 0);
+    $nombre = $_POST['nombre'] ?? '';
+    $descripcion = $_POST['descripcion'] ?? '';
+    $stock = (int)($_POST['stock'] ?? 0);
+    $precio_compra = (float)($_POST['precio_compra'] ?? 0);
+    $precio_venta = (float)($_POST['precio_venta'] ?? 0);
+    $id_proveedor = (int)($_POST['id_proveedor'] ?? 0);
+    
+    if (editarProducto($id, $nombre, $descripcion, $stock, $precio_compra, $precio_venta, $id_proveedor)) {
+        $success = "Producto actualizado exitosamente";
+        header("Location: inventario.php");
+        exit();
+    } else {
+        $error = "Error al actualizar el producto";
+    }
 }
 
-// Función para ocultar producto
-function ocultarProducto($id) {
-    global $conn;
-    $sql = "UPDATE productos SET activo = 0 WHERE id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $id);
-    return $stmt->execute();
+// Eliminar producto
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['eliminar_producto'])) {
+    $id = (int)($_POST['id'] ?? 0);
+    if (ocultarProducto($id)) {
+        $success = "Producto eliminado exitosamente";
+        header("Location: inventario.php");
+        exit();
+    } else {
+        $error = "Error al eliminar el producto";
+    }
 }
 
-// Función para editar producto - CORREGIDA
-function editarProducto($id, $nombre, $descripcion, $stock, $precio_compra, $precio_venta, $id_proveedor) {
-    global $conn;
-    $sql = "UPDATE productos SET nombre = ?, descripcion = ?, stock = ?, precio_compra = ?, precio_venta = ?, id_proveedor = ? WHERE id = ?";
-    $stmt = $conn->prepare($sql);
-    // 7 parámetros: s=string, s=string, i=integer, d=decimal, d=decimal, i=integer, i=integer
-    $stmt->bind_param("ssiidii", $nombre, $descripcion, $stock, $precio_compra, $precio_venta, $id_proveedor, $id);
-    return $stmt->execute();
-}
+// 2. OBTENER DATOS DEL MODELO
+// =============================
+$productos = getProductos($filtro);
+$proveedores = getProveedores();
+$productos_bajo_stock = getProductosBajoStock();
 
-// Función para obtener un producto por ID
-function getProductoById($id) {
-    global $conn;
-    $sql = "SELECT * FROM productos WHERE id = ? AND activo = 1";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    return $stmt->get_result()->fetch_assoc();
-}
-
-// Función para obtener productos con bajo stock
-function getProductosBajoStock($umbral = 10) {
-    global $conn;
-    $sql = "SELECT * FROM productos WHERE stock <= ? AND activo = 1 ORDER BY stock ASC";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $umbral);
-    $stmt->execute();
-    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-}
+// 3. LA VISTA SE CARGA A CONTINUACIÓN (en el archivo view)
 ?>

@@ -1,0 +1,74 @@
+/* Estilos para página de Cierre de Caja */
+
+@media print {
+    /* Ocultar elementos de navegación y footer al imprimir */
+    header, footer, nav, .no-print {
+        display: none !important;
+    }
+    
+    /* Ocultar elementos que no deben imprimirse */
+    .print-hide {
+        display: none !important;
+    }
+    
+    /* Ocultar todo excepto el histórico */
+    .grid, .print-header + div:not(.bg-white.rounded-lg.shadow-lg:last-of-type) {
+        display: none !important;
+    }
+    
+    /* Ajustar el contenedor principal */
+    body {
+        margin: 0;
+        padding: 20px;
+    }
+    
+    /* Forzar colores en impresión */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    /* Estilo para el encabezado de impresión */
+    .print-header {
+        border-bottom: 3px solid #2563eb;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    
+    /* Hacer la tabla más compacta en impresión */
+    table th, table td {
+        padding: 8px 12px !important;
+        font-size: 11px !important;
+    }
+    
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    
+    table th {
+        background-color: #374151 !important;
+        color: white !important;
+    }
+    
+    table td {
+        border: 1px solid #e5e7eb;
+    }
+    
+    /* Evitar saltos de página dentro de elementos */
+    .grid > div {
+        page-break-inside: avoid;
+    }
+    
+    /* Título para la tabla en impresión */
+    section::before {
+        content: "Histórico de Cierres de Caja";
+        display: block;
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+        color: #1f2937;
+    }
+}
