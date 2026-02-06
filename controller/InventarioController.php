@@ -1,8 +1,4 @@
 <?php
-// ============================================
-// CONTROLLER: Inventario
-// Orquesta: entrada del usuario -> model -> vista
-// ============================================
 
 // Cargar los modelos
 include '../model/ProductoModel.php';
@@ -14,8 +10,7 @@ $pageCSS = ['../css/ingresos_egresos.css'];
 $error = null;
 $success = null;
 
-// 1. PROCESAR ENTRADA DEL USUARIO (POST/GET)
-// ============================================
+// 1. PROCESAR ENTRADA DEL USUARIO
 
 // Obtener filtro si existe
 $filtro = $_GET['filtro'] ?? 'default';
@@ -70,10 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['eliminar_producto']))
 }
 
 // 2. OBTENER DATOS DEL MODELO
-// =============================
 $productos = getProductos($filtro);
 $proveedores = getProveedores();
 $productos_bajo_stock = getProductosBajoStock();
-
-// 3. LA VISTA SE CARGA A CONTINUACIÓN (en el archivo view)
 ?>

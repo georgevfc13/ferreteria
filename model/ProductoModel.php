@@ -1,11 +1,6 @@
 <?php
 include '../conexion.php';
 
-// ============================================
-// MODEL: Productos
-// Maneja toda la lógica de acceso a datos
-// ============================================
-
 if (!function_exists('getProductos')) {
     function getProductos($filtro = 'default') {
         global $conn;

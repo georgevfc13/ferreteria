@@ -1,11 +1,6 @@
 <?php
 include '../conexion.php';
 
-// ============================================
-// MODEL: Ingresos y Egresos
-// Maneja toda la lógica de acceso a datos
-// ============================================
-
 if (!function_exists('getIngresosEgresosSemanales')) {
     function getIngresosEgresosSemanales() {
         global $conn;

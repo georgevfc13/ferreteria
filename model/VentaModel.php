@@ -1,11 +1,6 @@
 <?php
 include '../conexion.php';
 
-// ============================================
-// MODEL: Ventas
-// Maneja lógica de datos de ventas
-// ============================================
-
 if (!function_exists('getVentasDelDia')) {
     function getVentasDelDia() {
         global $conn;

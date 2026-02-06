@@ -1,8 +1,4 @@
 <?php
-// ============================================
-// CONTROLLER: Home (Dashboard)
-// Orquesta: entrada del usuario -> model -> vista
-// ============================================
 
 // Cargar los modelos
 include '../model/VentaModel.php';
