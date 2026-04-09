@@ -1,4 +1,7 @@
 <?php
+// Configurar zona horaria
+date_default_timezone_set('America/Bogota');
+
 $servername = "localhost";  // Este es el servidor local
 $username = "root";         // Por Xampp siempre sera root
 $password = "";             // La contraseña en servidores locales es vacia

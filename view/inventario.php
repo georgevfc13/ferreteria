@@ -2,59 +2,33 @@
 $pageTitle = 'Inventario';
 $pageCSS = [];
 include '../controller/InventarioController.php';
-include '../controller/ProveedoresController.php';
 
 $filtro = $_GET['filtro'] ?? 'default';
 $productos = getProductos($filtro);
 $proveedores = getProveedores();
 $productosBajoStock = getProductosBajoStock(10);
 
-// Manejar POST para insertar producto
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['agregar'])) {
-    $nombre = $_POST['nombre'];
-    $descripcion = $_POST['descripcion'];
-    $stock = $_POST['stock'];
-    $precio_compra = $_POST['precio_compra'];
-    $precio_venta = $_POST['precio_venta'];
-    $id_proveedor = $_POST['id_proveedor'];
-    if (insertProducto($nombre, $descripcion, $stock, $precio_compra, $precio_venta, $id_proveedor)) {
-        header("Location: inventario.php");
-        exit();
-    }
-}
-
-// Manejar edición de producto
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editar'])) {
-    $id = $_POST['id'];
-    $nombre = $_POST['nombre'];
-    $descripcion = $_POST['descripcion'];
-    $stock = $_POST['stock'];
-    $precio_compra = $_POST['precio_compra'];
-    $precio_venta = $_POST['precio_venta'];
-    $id_proveedor = $_POST['id_proveedor'];
-    if (editarProducto($id, $nombre, $descripcion, $stock, $precio_compra, $precio_venta, $id_proveedor)) {
-        header("Location: inventario.php");
-        exit();
-    }
-}
-
-// Manejar eliminación de producto
-if (isset($_GET['eliminar'])) {
-    $id = intval($_GET['eliminar']);
-    if (ocultarProducto($id)) {
-        header("Location: inventario.php");
-        exit();
-    }
-}
-
 include '../template/header.php';
 ?>
+
+<?php if (isset($error)): ?>
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <?php echo htmlspecialchars($error); ?>
+    </div>
+<?php endif; ?>
+
+<?php if (isset($success)): ?>
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+        <?php echo htmlspecialchars($success); ?>
+    </div>
+<?php endif; ?>
 
 <!-- Notificaciones de Bajo Stock (esquina derecha) -->
 <?php if (!empty($productosBajoStock)): ?>
     <div class="fixed top-20 right-4 z-50 space-y-3 max-w-sm">
         <?php foreach ($productosBajoStock as $prod): ?>
-            <div class="bg-red-100 border-l-4 border-red-600 p-4 rounded-lg shadow-lg">
+            <div class="bg-red-100 border-l-4 border-red-600 p-4 rounded-lg shadow-lg relative">
+                <button onclick="this.parentElement.style.display='none'" class="absolute top-2 right-2 text-red-600 hover:text-red-800 text-lg font-bold">&times;</button>
                 <div class="flex items-start">
                     <i class="fas fa-exclamation-circle text-red-600 text-xl mr-3 mt-1"></i>
                     <div>
@@ -69,21 +43,6 @@ include '../template/header.php';
 
 <main class="container mx-auto px-4 py-8 bg-white bg-opacity-70 rounded-lg shadow-lg mx-4 md:mx-auto my-8">
     <h1 class="text-3xl font-bold text-dark mb-6 text-center">Inventario</h1>
-
-    <!-- Filtros -->
-    <div class="mb-8 bg-gray-50 rounded-lg p-6">
-        <form method="GET" class="flex items-center">
-            <label for="filtro" class="block text-lg font-semibold text-dark mr-4">Filtrar Productos:</label>
-            <select name="filtro" id="filtro" onchange="this.form.submit()" class="block w-full md:w-1/3 py-3 px-4 border border-gray-300 bg-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-gray-700">
-                <option value="default" <?php echo $filtro == 'default' ? 'selected' : ''; ?>>Por defecto</option>
-                <option value="mas-stock" <?php echo $filtro == 'mas-stock' ? 'selected' : ''; ?>>Más Stock</option>
-                <option value="menos-stock" <?php echo $filtro == 'menos-stock' ? 'selected' : ''; ?>>Menos Stock</option>
-                <option value="mas-vendido" <?php echo $filtro == 'mas-vendido' ? 'selected' : ''; ?>>Más Vendido</option>
-                <option value="menos-vendido" <?php echo $filtro == 'menos-vendido' ? 'selected' : ''; ?>>Menos Vendido</option>
-                <option value="mayor-ganancia" <?php echo $filtro == 'mayor-ganancia' ? 'selected' : ''; ?>>Mayor Ganancia</option>
-            </select>
-        </form>
-    </div>
 
     <!-- Formulario para Agregar Producto -->
     <div class="bg-gray-50 rounded-lg p-6 mt-8">
@@ -121,6 +80,21 @@ include '../template/header.php';
             <div class="md:col-span-2">
                 <button type="submit" name="agregar" class="w-full bg-primary text-secondary py-2 px-4 rounded-md hover:bg-secondary hover:text-primary transition duration-300">Agregar Producto</button>
             </div>
+        </form>
+    </div>
+
+    <!-- Filtros -->
+    <div class="mb-8 bg-gray-50 rounded-lg p-6">
+        <form method="GET" class="flex items-center">
+            <label for="filtro" class="block text-lg font-semibold text-dark mr-4">Filtrar Productos:</label>
+            <select name="filtro" id="filtro" onchange="this.form.submit()" class="block w-full md:w-1/3 py-3 px-4 border border-gray-300 bg-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-gray-700">
+                <option value="default" <?php echo $filtro == 'default' ? 'selected' : ''; ?>>Por defecto</option>
+                <option value="mas-stock" <?php echo $filtro == 'mas-stock' ? 'selected' : ''; ?>>Más Stock</option>
+                <option value="menos-stock" <?php echo $filtro == 'menos-stock' ? 'selected' : ''; ?>>Menos Stock</option>
+                <option value="mas-vendido" <?php echo $filtro == 'mas-vendido' ? 'selected' : ''; ?>>Más Vendido</option>
+                <option value="menos-vendido" <?php echo $filtro == 'menos-vendido' ? 'selected' : ''; ?>>Menos Vendido</option>
+                <option value="mayor-ganancia" <?php echo $filtro == 'mayor-ganancia' ? 'selected' : ''; ?>>Mayor Ganancia</option>
+            </select>
         </form>
     </div>
     <div id="productos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

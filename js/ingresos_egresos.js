@@ -1,5 +1,39 @@
 // JavaScript para la página de Ingresos y Egresos
 
+// ===== FUNCIÓN PARA VALIDAR STOCK DISPONIBLE =====
+function checkStockAvailability() {
+    const selectProduct = document.getElementById('id_producto');
+    const stockWarning = document.getElementById('stockWarning');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    if (!selectProduct) return;
+    
+    const selectedOption = selectProduct.options[selectProduct.selectedIndex];
+    const stock = parseInt(selectedOption.getAttribute('data-stock')) || 0;
+    
+    if (stock <= 0 && selectProduct.value !== '') {
+        // Stock no disponible
+        if (stockWarning) {
+            stockWarning.classList.remove('hidden');
+        }
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.5';
+            submitBtn.style.cursor = 'not-allowed';
+        }
+    } else {
+        // Stock disponible
+        if (stockWarning) {
+            stockWarning.classList.add('hidden');
+        }
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = '1';
+            submitBtn.style.cursor = 'pointer';
+        }
+    }
+}
+
 // ===== FUNCIÓN GLOBAL PARA CAMBIAR PESTAÑAS =====
 function showTab(tabName) {
     const tabs = document.querySelectorAll('.tab-content');

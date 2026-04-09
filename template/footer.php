@@ -21,7 +21,7 @@
                 </div>
             </div>
             <div class="border-t border-gray-600 mt-8 pt-6 text-center">
-                <p>&copy; 2026 Ferretería JJ y George. Todos los derechos reservados.</p>
+                <p>&copy; 2026 Ferretería JJ y George.</p>
             </div>
         </div>
     </footer>

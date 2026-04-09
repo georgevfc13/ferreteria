@@ -9,41 +9,20 @@ include '../template/header.php';
 <main class="container mx-auto px-4 py-8 bg-white bg-opacity-70 rounded-lg shadow-lg mx-4 md:mx-auto my-8">
     <h1 class="text-3xl font-bold text-dark mb-6 text-center">Ingresos y Egresos</h1>
 
-    <!-- Gráfica Detallada -->
-    <div id="chartContainer" class="bg-gray-50 rounded-xl shadow-md p-8 mb-8">
-        <h2 class="text-2xl font-semibold text-dark mb-6 text-center">Reporte Detallado Semanal</h2>
-        <canvas id="detailedChart" width="400" height="200" data-dias="<?php echo htmlspecialchars(json_encode(array_column($ingresos_egresos_semanales, 'dia'))); ?>" data-ingresos="<?php echo htmlspecialchars(json_encode(array_map('floatval', array_column($ingresos_egresos_semanales, 'ingresos')))); ?>" data-egresos="<?php echo htmlspecialchars(json_encode(array_map('floatval', array_column($ingresos_egresos_semanales, 'egresos')))); ?>"></canvas>
-    </div>
-
-    <!-- Tabla de Detalles -->
-    <div class="bg-gray-50 rounded-xl shadow-md p-8">
-        <h2 class="text-2xl font-semibold text-dark mb-6 text-center">Detalles por Día</h2>
-        <div class="overflow-x-auto">
-            <table class="min-w-full table-auto bg-white rounded-lg">
-                <thead class="bg-primary text-secondary">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Día</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Ingresos</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Gastos</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Ganancia Neta</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                    <?php foreach ($ingresos_egresos_semanales as $dato): ?>
-                        <tr class="hover:bg-gray-100">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><?php echo $dato['dia']; ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$<?php echo number_format($dato['ingresos'], 2); ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$<?php echo number_format($dato['egresos'], 2); ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm <?php echo $dato['neto'] >= 0 ? 'text-green-600' : 'text-red-600'; ?>">$<?php echo number_format($dato['neto'], 2); ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+    <?php if (isset($error) && $error): ?>
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+            <strong>Error:</strong> <?php echo htmlspecialchars($error); ?>
         </div>
-    </div>
+    <?php endif; ?>
+
+    <?php if (isset($success) && $success): ?>
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+            <strong>Éxito:</strong> <?php echo htmlspecialchars($success); ?>
+        </div>
+    <?php endif; ?>
 
     <!-- Formulario para Agregar - CON TABS -->
-    <div id="formContainer" class="form-card rounded-xl shadow-2xl p-8 mt-8 relative">
+    <div id="formContainer" class="form-card rounded-xl shadow-2xl p-8 mb-8 relative">
         <!-- Tabs -->
         <div class="flex relative z-10 mb-6">
             <button class="tab-button active flex-1 py-3 px-6 bg-white bg-opacity-20 rounded-lg mr-2 text-white font-semibold transition-all duration-300" onclick="showTab('ingreso')">
@@ -65,14 +44,15 @@ include '../template/header.php';
                     <label for="id_producto" class="block text-sm font-medium text-white mb-2 transition-all group-hover:text-yellow-200">
                         <span class="inline-block mr-2">📦</span>Producto
                     </label>
-                    <select name="id_producto" id="id_producto" required class="form-input mt-1 block w-full py-3 px-4 border-2 border-white border-opacity-30 bg-white bg-opacity-20 backdrop-blur-sm rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:border-transparent text-white font-semibold">
+                    <select name="id_producto" id="id_producto" required class="form-input mt-1 block w-full py-3 px-4 border-2 border-white border-opacity-30 bg-white bg-opacity-20 backdrop-blur-sm rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:border-transparent text-white font-semibold" onchange="checkStockAvailability()">
                         <option value="" class="text-gray-800">-- Selecciona un producto --</option>
                         <?php foreach ($productos as $prod): ?>
-                            <option value="<?php echo $prod['id']; ?>" data-precio="<?php echo $prod['precio_venta']; ?>" class="text-gray-800">
-                                <?php echo $prod['nombre']; ?> - $<?php echo number_format($prod['precio_venta'], 2); ?>
+                            <option value="<?php echo $prod['id']; ?>" data-precio="<?php echo $prod['precio_venta']; ?>" data-stock="<?php echo $prod['stock']; ?>" class="text-gray-800">
+                                <?php echo $prod['nombre']; ?> - Stock: <?php echo $prod['stock']; ?> - $<?php echo number_format($prod['precio_venta'], 2); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
+                    <p id="stockWarning" class="text-red-300 text-sm mt-2 hidden">⚠️ Este producto no tiene stock disponible</p>
                 </div>
                 
                 <div class="group">
@@ -90,7 +70,7 @@ include '../template/header.php';
                 </div>
                 
                 <div class="md:col-span-2">
-                    <button type="submit" class="submit-btn relative w-full text-white font-bold py-4 px-6 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+                    <button type="submit" id="submitBtn" class="submit-btn relative w-full text-white font-bold py-4 px-6 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
                         <span class="relative z-10 text-lg">🚀 Agregar Ingreso</span>
                     </button>
                 </div>
@@ -138,6 +118,39 @@ include '../template/header.php';
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Gráfica Detallada -->
+    <div id="chartContainer" class="bg-gray-50 rounded-xl shadow-md p-8 mb-8">
+        <h2 class="text-2xl font-semibold text-dark mb-6 text-center">Reporte Detallado Semanal</h2>
+        <canvas id="detailedChart" width="400" height="200" data-dias="<?php echo htmlspecialchars(json_encode(array_column($ingresos_egresos_semanales, 'dia'))); ?>" data-ingresos="<?php echo htmlspecialchars(json_encode(array_map('floatval', array_column($ingresos_egresos_semanales, 'ingresos')))); ?>" data-egresos="<?php echo htmlspecialchars(json_encode(array_map('floatval', array_column($ingresos_egresos_semanales, 'egresos')))); ?>"></canvas>
+    </div>
+
+    <!-- Tabla de Detalles -->
+    <div class="bg-gray-50 rounded-xl shadow-md p-8">
+        <h2 class="text-2xl font-semibold text-dark mb-6 text-center">Detalles por Día</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full table-auto bg-white rounded-lg">
+                <thead class="bg-primary text-secondary">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Día</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Ingresos</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Gastos</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Ganancia Neta</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    <?php foreach ($ingresos_egresos_semanales as $dato): ?>
+                        <tr class="hover:bg-gray-100">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><?php echo $dato['dia']; ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$<?php echo number_format($dato['ingresos'], 2); ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$<?php echo number_format($dato['egresos'], 2); ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm <?php echo $dato['neto'] >= 0 ? 'text-green-600' : 'text-red-600'; ?>">$<?php echo number_format($dato['neto'], 2); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
     </div>
 

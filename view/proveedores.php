@@ -49,8 +49,10 @@ include '../template/header.php';
                     <p class="text-gray-700 mb-2"><strong>Contacto:</strong> <?php echo htmlspecialchars($proveedor['contacto'] ?? 'Sin contacto'); ?></p>
                     <p class="text-gray-700 mb-2"><i class="fas fa-phone mr-2"></i><?php echo htmlspecialchars($proveedor['telefono'] ?? 'Sin teléfono'); ?></p>
                     <p class="text-gray-700 mb-4"><i class="fas fa-envelope mr-2"></i><?php echo htmlspecialchars($proveedor['email'] ?? 'Sin email'); ?></p>
-                    <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $proveedor['telefono']); ?>?text=Solicito%20más%20productos" 
-                       class="inline-flex items-center bg-green-500 text-white px-4 py-2 rounded-full font-semibold hover:bg-green-600 transition duration-300">
+                    <a href="https://web.whatsapp.com/send<?php echo preg_replace('/[^0-9]/', '', $proveedor['telefono']); ?>?text=Solicito%20más%20productos"
+                        class="inline-flex items-center bg-green-500 text-white px-4 py-2 rounded-full font-semibold hover:bg-green-600 transition duration-300"
+                        target="_blank"
+                        rel="noopener noreferrer">
                         <i class="fab fa-whatsapp mr-2"></i>Enviar Mensaje
                     </a>
                 </div>
@@ -105,12 +107,12 @@ include '../template/header.php';
                         <div>
                             <p class="font-semibold text-dark"><?php echo htmlspecialchars($prov['nombre']); ?> - <?php echo htmlspecialchars($prov['contacto'] ?? 'Sin contacto'); ?></p>
                             <p class="text-sm text-gray-600">
-                                <i class="fas fa-phone mr-1"></i><?php echo htmlspecialchars($prov['telefono'] ?? 'N/A'); ?> | 
+                                <i class="fas fa-phone mr-1"></i><?php echo htmlspecialchars($prov['telefono'] ?? 'N/A'); ?> |
                                 <i class="fas fa-envelope mr-1"></i><?php echo htmlspecialchars($prov['email'] ?? 'N/A'); ?>
                             </p>
                         </div>
-                        <button onclick="openDeleteModal(<?php echo $prov['id']; ?>, '<?php echo addslashes($prov['nombre']); ?>')" 
-                                class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300">
+                        <button onclick="openDeleteModal(<?php echo $prov['id']; ?>, '<?php echo addslashes($prov['nombre']); ?>')"
+                            class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300">
                             <i class="fas fa-trash mr-1"></i>Eliminar
                         </button>
                     </div>
@@ -127,29 +129,29 @@ include '../template/header.php';
     <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full mx-4">
         <h2 id="modalTitle" class="text-2xl font-bold text-dark mb-4">Eliminar Proveedor</h2>
         <p class="text-gray-700 mb-4">Para confirmar la eliminación, ingresa el código de seguridad:</p>
-        
+
         <div class="bg-yellow-100 border border-yellow-400 rounded p-3 mb-4">
             <p id="confirmationCode" class="font-mono text-center text-lg font-bold text-dark">Código: 000000</p>
         </div>
-        
+
         <div class="mb-6">
-            <input type="text" id="codeInput" placeholder="Ingresa el código aquí" 
-                   class="w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+            <input type="text" id="codeInput" placeholder="Ingresa el código aquí"
+                class="w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-gray-900">
         </div>
-        
+
         <form id="deleteForm" method="POST" class="hidden">
             <input type="hidden" name="eliminar" value="1">
             <input type="hidden" id="deleteId" name="id">
             <input type="hidden" id="deleteCode" name="codigo">
         </form>
-        
+
         <div class="flex gap-4">
-            <button id="cancelBtn" type="button" 
-                    class="flex-1 bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400 transition duration-300 font-semibold">
+            <button id="cancelBtn" type="button"
+                class="flex-1 bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400 transition duration-300 font-semibold">
                 Cancelar
             </button>
-            <button id="confirmBtn" type="button" 
-                    class="flex-1 bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 transition duration-300 font-semibold">
+            <button id="confirmBtn" type="button"
+                class="flex-1 bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 transition duration-300 font-semibold">
                 Eliminar
             </button>
         </div>

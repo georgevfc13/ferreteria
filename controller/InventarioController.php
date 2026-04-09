@@ -16,13 +16,13 @@ $success = null;
 $filtro = $_GET['filtro'] ?? 'default';
 
 // Agregar producto
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['agregar_producto'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['agregar'])) {
     $nombre = $_POST['nombre'] ?? '';
     $descripcion = $_POST['descripcion'] ?? '';
     $stock = (int)($_POST['stock'] ?? 0);
     $precio_compra = (float)($_POST['precio_compra'] ?? 0);
     $precio_venta = (float)($_POST['precio_venta'] ?? 0);
-    $id_proveedor = (int)($_POST['id_proveedor'] ?? 0);
+    $id_proveedor = !empty($_POST['id_proveedor']) ? (int)$_POST['id_proveedor'] : NULL;
     
     if (insertProducto($nombre, $descripcion, $stock, $precio_compra, $precio_venta, $id_proveedor)) {
         $success = "Producto agregado exitosamente";
@@ -34,14 +34,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['agregar_producto'])) 
 }
 
 // Editar producto
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editar_producto'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editar'])) {
     $id = (int)($_POST['id'] ?? 0);
     $nombre = $_POST['nombre'] ?? '';
     $descripcion = $_POST['descripcion'] ?? '';
     $stock = (int)($_POST['stock'] ?? 0);
     $precio_compra = (float)($_POST['precio_compra'] ?? 0);
     $precio_venta = (float)($_POST['precio_venta'] ?? 0);
-    $id_proveedor = (int)($_POST['id_proveedor'] ?? 0);
+    $id_proveedor = !empty($_POST['id_proveedor']) ? (int)$_POST['id_proveedor'] : NULL;
     
     if (editarProducto($id, $nombre, $descripcion, $stock, $precio_compra, $precio_venta, $id_proveedor)) {
         $success = "Producto actualizado exitosamente";
@@ -53,8 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editar_producto'])) {
 }
 
 // Eliminar producto
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['eliminar_producto'])) {
-    $id = (int)($_POST['id'] ?? 0);
+if (isset($_GET['eliminar'])) {
+    $id = intval($_GET['eliminar']);
     if (ocultarProducto($id)) {
         $success = "Producto eliminado exitosamente";
         header("Location: inventario.php");

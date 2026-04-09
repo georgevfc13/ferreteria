@@ -28,20 +28,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['agregar'])) {
         $id_producto = (int)($_POST['id_producto'] ?? 0);
         
         if (!empty($tipo) && $cantidad > 0 && $id_producto > 0) {
-            // Obtener el precio del producto
+            // Obtener el precio del producto y verificar stock
             $productos_temp = getProductos('default');
             $precio_venta = 0;
             $nombre_producto = '';
+            $stock_disponible = 0;
             
             foreach ($productos_temp as $p) {
                 if ($p['id'] == $id_producto) {
                     $precio_venta = $p['precio_venta'];
                     $nombre_producto = $p['nombre'];
+                    $stock_disponible = $p['stock'];
                     break;
                 }
             }
             
-            if ($precio_venta > 0) {
+            // Validar que hay stock disponible
+            if ($stock_disponible <= 0) {
+                $error = "No hay stock disponible para el producto: " . $nombre_producto;
+            } elseif ($cantidad > $stock_disponible) {
+                $error = "Stock insuficiente. Disponible: " . $stock_disponible . " unidades, solicitado: " . $cantidad;
+            } elseif ($precio_venta > 0) {
                 $monto = $cantidad * $precio_venta;
                 $descripcion = $nombre_producto;
                 $categoria = $nombre_producto;
