@@ -21,7 +21,7 @@ if (!function_exists('getProductos')) {
             case 'menos-stock':
                 $sql .= " ORDER BY p.stock ASC";
                 break;
-            case 'mas-vendido':
+            case 'mas-vendido': 
                 $sql .= " ORDER BY vendido DESC";
                 break;
             case 'menos-vendido':
