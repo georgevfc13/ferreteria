@@ -11,20 +11,20 @@
         display: none !important;
     }
     
-    /* Ocultar todo excepto el histórico */
-    body > * {
-        display: none !important;
-    }
-    
-    #historico-cierres {
-        display: block !important;
-    }
-    
     /* Quitar fondo de la página */
     body {
         background: white !important;
         margin: 0;
         padding: 20px;
+    }
+    
+    /* Ocultar todo excepto el histórico */
+    section > * {
+        display: none !important;
+    }
+    
+    section > .print-only {
+        display: block !important;
     }
     
     /* Forzar colores en impresión */
@@ -67,7 +67,7 @@
     }
     
     /* Título para la tabla en impresión */
-    #historico-cierres::before {
+    .print-only::before {
         content: "Histórico de Cierres de Caja";
         display: block;
         font-size: 24px;

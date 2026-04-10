@@ -11,6 +11,15 @@
         display: none !important;
     }
     
+    /* Mostrar únicamente el cuadro del kardex */
+    section > *:not(.print-only) {
+        display: none !important;
+    }
+    
+    section > .print-only {
+        display: block !important;
+    }
+    
     /* Ajustar el contenedor principal */
     body {
         margin: 0;

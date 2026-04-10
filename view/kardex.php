@@ -131,7 +131,7 @@ include '../template/header.php';
         </div>
     <?php endif; ?>
 
-    <div class="bg-white rounded-lg shadow overflow-x-auto">
+    <div class="bg-white rounded-lg shadow overflow-x-auto print-only">
         <table class="min-w-full">
             <thead class="bg-blue-600 text-white">
                 <tr>
