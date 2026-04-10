@@ -243,14 +243,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         datasets: [{
                             label: 'Ingresos',
                             data: ingresosData,
-                            backgroundColor: '#32CD32',
-                            borderColor: '#228B22',
+                            backgroundColor: '#2563EB',
+                            borderColor: '#1D4ED8',
                             borderWidth: 1
                         }, {
                             label: 'Gastos',
                             data: egresosData,
-                            backgroundColor: '#FFD700',
-                            borderColor: '#DAA520',
+                            backgroundColor: '#6B7280',
+                            borderColor: '#4B5563',
                             borderWidth: 1
                         }]
                     },

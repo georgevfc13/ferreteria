@@ -18,7 +18,7 @@ include '../template/header.php';
 <?php endif; ?>
 
 <?php if (isset($success)): ?>
-    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+    <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded mb-4">
         <?php echo htmlspecialchars($success); ?>
     </div>
 <?php endif; ?>
@@ -116,7 +116,7 @@ include '../template/header.php';
                     <p class="text-gray-700 mb-4"><strong>Ganancia:</strong> $<?php echo number_format($producto['precio_venta'] - $producto['precio_compra'], 2); ?></p>
                     
                     <div class="flex gap-2 mb-3">
-                        <a href="kardex.php?producto_id=<?php echo $producto['id']; ?>" class="flex-1 bg-primary text-secondary text-center py-2 px-3 rounded font-semibold hover:bg-secondary hover:text-primary transition duration-300 text-sm">
+                        <a href="kardex.php?producto_id=<?php echo $producto['id']; ?>" class="flex-1 bg-yellow-500 text-black text-center py-2 px-3 rounded font-semibold hover:bg-yellow-600 transition duration-300 text-sm">
                             <i class="fas fa-chart-line mr-1"></i>Kardex
                         </a>
                         <a href="editar_producto.php?id=<?php echo $producto['id']; ?>" class="flex-1 bg-blue-600 text-white text-center py-2 px-3 rounded font-semibold hover:bg-blue-700 transition duration-300 text-sm">

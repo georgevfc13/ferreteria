@@ -12,10 +12,10 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#FFD700',
-                        secondary: '#32CD32',
+                        primary: '#2563EB',
+                        secondary: '#6B7280',
                         accent: '#FFFFFF',
-                        dark: '#2D3748'
+                        dark: '#1F2937'
                     }
                 }
             }

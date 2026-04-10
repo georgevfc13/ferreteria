@@ -80,7 +80,7 @@ include '../template/header.php';
             </div>
 
             <div class="flex gap-4">
-                <button type="submit" name="guardar" class="flex-1 bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition duration-300">
+                <button type="submit" name="guardar" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition duration-300">
                     <i class="fas fa-save mr-2"></i>Guardar Cambios
                 </button>
                 <a href="inventario.php" class="flex-1 bg-gray-600 text-white font-bold py-3 rounded-lg text-center hover:bg-gray-700 transition duration-300">

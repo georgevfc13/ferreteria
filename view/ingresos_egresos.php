@@ -16,10 +16,11 @@ include '../template/header.php';
     <?php endif; ?>
 
     <?php if (isset($success) && $success): ?>
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+        <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded mb-6">
             <strong>Éxito:</strong> <?php echo htmlspecialchars($success); ?>
         </div>
     <?php endif; ?>
+
 
     <!-- Formulario para Agregar - CON TABS -->
     <div id="formContainer" class="form-card rounded-xl shadow-2xl p-8 mb-8 relative">
@@ -41,10 +42,10 @@ include '../template/header.php';
                 <input type="hidden" name="agregar" value="1">
                 
                 <div class="group md:col-span-2">
-                    <label for="id_producto" class="block text-sm font-medium text-white mb-2 transition-all group-hover:text-yellow-200">
+                    <label for="id_producto" class="block text-sm font-medium text-white mb-2 transition-all group-hover:text-gray-200">
                         <span class="inline-block mr-2">📦</span>Producto
                     </label>
-                    <select name="id_producto" id="id_producto" required class="form-input mt-1 block w-full py-3 px-4 border-2 border-white border-opacity-30 bg-white bg-opacity-20 backdrop-blur-sm rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:border-transparent text-white font-semibold" onchange="checkStockAvailability()">
+                    <select name="id_producto" id="id_producto" required class="form-input mt-1 block w-full py-3 px-4 border-2 border-white border-opacity-30 bg-white bg-opacity-20 backdrop-blur-sm rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent text-white font-semibold" onchange="checkStockAvailability()">
                         <option value="" class="text-gray-800">-- Selecciona un producto --</option>
                         <?php foreach ($productos as $prod): ?>
                             <option value="<?php echo $prod['id']; ?>" data-precio="<?php echo $prod['precio_venta']; ?>" data-stock="<?php echo $prod['stock']; ?>" class="text-gray-800">
@@ -56,17 +57,17 @@ include '../template/header.php';
                 </div>
                 
                 <div class="group">
-                    <label for="cantidad" class="block text-sm font-medium text-white mb-2 transition-all group-hover:text-yellow-200">
+                    <label for="cantidad" class="block text-sm font-medium text-white mb-2 transition-all group-hover:text-gray-200">
                         <span class="inline-block mr-2">📊</span>Cantidad
                     </label>
-                    <input type="number" step="1" name="cantidad" id="cantidad" required class="form-input mt-1 block w-full py-3 px-4 border-2 border-white border-opacity-30 bg-white bg-opacity-20 backdrop-blur-sm rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:border-transparent text-white font-semibold placeholder-white placeholder-opacity-50" placeholder="0" min="1">
+                    <input type="number" step="1" name="cantidad" id="cantidad" required class="form-input mt-1 block w-full py-3 px-4 border-2 border-white border-opacity-30 bg-white bg-opacity-20 backdrop-blur-sm rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent text-white font-semibold placeholder-white placeholder-opacity-50" placeholder="0" min="1">
                 </div>
                 
                 <div class="group">
-                    <label for="monto_total" class="block text-sm font-medium text-white mb-2 transition-all group-hover:text-yellow-200">
+                    <label for="monto_total" class="block text-sm font-medium text-white mb-2 transition-all group-hover:text-gray-200">
                         <span class="inline-block mr-2">💰</span>Monto Total
                     </label>
-                    <input type="number" step="0.01" name="monto_total" id="monto_total" readonly class="form-input mt-1 block w-full py-3 px-4 border-2 border-white border-opacity-30 bg-white bg-opacity-20 backdrop-blur-sm rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:border-transparent text-white font-semibold placeholder-white placeholder-opacity-50" placeholder="0.00">
+                    <input type="number" step="0.01" name="monto_total" id="monto_total" readonly class="form-input mt-1 block w-full py-3 px-4 border-2 border-white border-opacity-30 bg-white bg-opacity-20 backdrop-blur-sm rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent text-white font-semibold placeholder-white placeholder-opacity-50" placeholder="0.00">
                 </div>
                 
                 <div class="md:col-span-2">
@@ -85,10 +86,10 @@ include '../template/header.php';
                 <input type="hidden" name="agregar" value="1">
                 
                 <div class="group md:col-span-2">
-                    <label for="id_proveedor" class="block text-sm font-medium text-white mb-2 transition-all group-hover:text-yellow-200">
+                    <label for="id_proveedor" class="block text-sm font-medium text-white mb-2 transition-all group-hover:text-gray-200">
                         <span class="inline-block mr-2">🏭</span>Proveedor
                     </label>
-                    <select name="id_proveedor" id="id_proveedor" required class="form-input mt-1 block w-full py-3 px-4 border-2 border-white border-opacity-30 bg-white bg-opacity-20 backdrop-blur-sm rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:border-transparent text-white font-semibold">
+                    <select name="id_proveedor" id="id_proveedor" required class="form-input mt-1 block w-full py-3 px-4 border-2 border-white border-opacity-30 bg-white bg-opacity-20 backdrop-blur-sm rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent text-white font-semibold">
                         <option value="" class="text-gray-800">-- Selecciona un proveedor --</option>
                         <?php foreach ($proveedores as $prov): ?>
                             <option value="<?php echo $prov['id']; ?>" class="text-gray-800">
@@ -99,17 +100,17 @@ include '../template/header.php';
                 </div>
                 
                 <div class="group md:col-span-2">
-                    <label for="monto_egreso" class="block text-sm font-medium text-white mb-2 transition-all group-hover:text-yellow-200">
+                    <label for="monto_egreso" class="block text-sm font-medium text-white mb-2 transition-all group-hover:text-gray-200">
                         <span class="inline-block mr-2">💰</span>Monto Pagado
                     </label>
-                    <input type="number" step="0.01" name="monto" id="monto_egreso" required class="form-input mt-1 block w-full py-3 px-4 border-2 border-white border-opacity-30 bg-white bg-opacity-20 backdrop-blur-sm rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:border-transparent text-white font-semibold placeholder-white placeholder-opacity-50" placeholder="0.00" min="0.01">
+                    <input type="number" step="0.01" name="monto" id="monto_egreso" required class="form-input mt-1 block w-full py-3 px-4 border-2 border-white border-opacity-30 bg-white bg-opacity-20 backdrop-blur-sm rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent text-white font-semibold placeholder-white placeholder-opacity-50" placeholder="0.00" min="0.01">
                 </div>
                 
                 <div class="md:col-span-2 group">
-                    <label for="detalle" class="block text-sm font-medium text-white mb-2 transition-all group-hover:text-yellow-200">
+                    <label for="detalle" class="block text-sm font-medium text-white mb-2 transition-all group-hover:text-gray-200">
                         <span class="inline-block mr-2">📝</span>Detalle (Opcional)
                     </label>
-                    <textarea name="detalle" id="detalle" rows="2" class="form-input mt-1 block w-full py-3 px-4 border-2 border-white border-opacity-30 bg-white bg-opacity-20 backdrop-blur-sm rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:border-transparent text-white font-semibold placeholder-white placeholder-opacity-50" placeholder="Ej: Materiales, Herramientas, etc..."></textarea>
+                    <textarea name="detalle" id="detalle" rows="2" class="form-input mt-1 block w-full py-3 px-4 border-2 border-white border-opacity-30 bg-white bg-opacity-20 backdrop-blur-sm rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent text-white font-semibold placeholder-white placeholder-opacity-50" placeholder="Ej: Materiales, Herramientas, etc..."></textarea>
                 </div>
                 
                 <div class="md:col-span-2">
@@ -146,7 +147,7 @@ include '../template/header.php';
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><?php echo $dato['dia']; ?></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$<?php echo number_format($dato['ingresos'], 2); ?></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$<?php echo number_format($dato['egresos'], 2); ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm <?php echo $dato['neto'] >= 0 ? 'text-green-600' : 'text-red-600'; ?>">$<?php echo number_format($dato['neto'], 2); ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm <?php echo $dato['neto'] >= 0 ? 'text-blue-600' : 'text-red-600'; ?>">$<?php echo number_format($dato['neto'], 2); ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -163,7 +164,7 @@ include '../template/header.php';
                     <div class="flex justify-between items-center bg-white p-4 rounded-lg shadow">
                         <div>
                             <p class="font-semibold text-dark"><?php echo ucfirst($mov['tipo']); ?>: $<?php echo number_format($mov['monto'], 2); ?> - <?php echo $mov['descripcion']; ?> (<?php echo $mov['categoria']; ?>)</p>
-                            <p class="text-sm text-green-800"><?php echo $mov['fecha']; ?></p>
+                            <p class="text-sm text-blue-800"><?php echo $mov['fecha']; ?></p>
                         </div>
                         <button onclick="openDeleteModal(<?php echo $mov['id']; ?>, '<?php echo addslashes($mov['descripcion']); ?>')" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300">Eliminar</button>
                     </div>

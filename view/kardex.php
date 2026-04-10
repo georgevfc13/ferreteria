@@ -117,13 +117,13 @@ include '../template/header.php';
     </div>
 
     <?php if (empty($movimientos)): ?>
-        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+        <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
             <div class="flex">
                 <div class="flex-shrink-0">
-                    <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+                    <i class="fas fa-exclamation-triangle text-blue-400"></i>
                 </div>
                 <div class="ml-3">
-                    <p class="text-sm text-yellow-700">
+                    <p class="text-sm text-blue-700">
                         No hay movimientos registrados para este producto. Las salidas se registran automáticamente cuando realizas ventas en "Ingresos y Egresos".
                     </p>
                 </div>
@@ -148,8 +148,8 @@ include '../template/header.php';
                 <?php
                 if (!empty($movimientos)) {
                     foreach ($movimientos as $mov) {
-                        $clase_tipo = $mov['tipo_movimiento'] === 'Entrada' ? 'text-green-600' : 'text-red-600';
-                        $bg_clase = $mov['tipo_movimiento'] === 'Entrada' ? 'bg-green-50' : 'bg-red-50';
+                        $clase_tipo = $mov['tipo_movimiento'] === 'Entrada' ? 'text-blue-600' : 'text-red-600';
+                        $bg_clase = $mov['tipo_movimiento'] === 'Entrada' ? 'bg-blue-50' : 'bg-red-50';
                         
                         echo '<tr class="border-b hover:bg-gray-50 ' . $bg_clase . '">'; 
                         echo '<td class="px-6 py-4 text-sm text-black">' . date('d/m/Y H:i', strtotime($mov['fecha'])) . '</td>'; 
@@ -158,7 +158,7 @@ include '../template/header.php';
                         echo '<td class="px-6 py-4 text-right text-sm text-black">$' . number_format($mov['precio_unitario'], 2) . '</td>'; 
                         echo '<td class="px-6 py-4 text-right font-bold text-sm text-blue-600">' . number_format($mov['saldo_cantidad'], 0) . '</td>'; 
                         echo '<td class="px-6 py-4 text-right text-sm text-black">$' . number_format($mov['precio_promedio'], 2) . '</td>'; 
-                        echo '<td class="px-6 py-4 text-right font-bold text-sm text-green-600">$' . number_format($mov['saldo_valor'], 2) . '</td>'; 
+                        echo '<td class="px-6 py-4 text-right font-bold text-sm text-blue-600">$' . number_format($mov['saldo_valor'], 2) . '</td>'; 
                         echo '</tr>'; 
                     }
                 } else {
@@ -178,7 +178,7 @@ include '../template/header.php';
         </a>
         
         <?php if (!empty($movimientos)): ?>
-        <button onclick="window.print()" class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition duration-300">
+        <button onclick="window.print()" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300">
             <i class="fas fa-print mr-2"></i>Imprimir Kardex
         </button>
         <?php endif; ?>

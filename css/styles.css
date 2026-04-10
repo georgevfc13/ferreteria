@@ -23,12 +23,12 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #FFD700;
+    background: #6B7280;
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #32CD32;
+    background: #2563EB;
 }
 
 /* Animations */

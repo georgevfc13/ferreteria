@@ -18,14 +18,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 datasets: [{
                     label: 'Ingresos',
                     data: ingresosData,
-                    borderColor: '#32CD32',
-                    backgroundColor: 'rgba(50, 205, 50, 0.1)',
+                    borderColor: '#2563EB',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
                     tension: 0.4
                 }, {
                     label: 'Gastos',
                     data: egresosData,
-                    borderColor: '#FFD700',
-                    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                    borderColor: '#6B7280',
+                    backgroundColor: 'rgba(107, 114, 128, 0.1)',
                     tension: 0.4
                 }]
             },

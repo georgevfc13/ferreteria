@@ -64,7 +64,7 @@ include '../template/header.php';
     </div>
 
     <?php if ($mensaje): ?>
-        <div class="mb-6 p-4 rounded-lg <?php echo $tipo_mensaje === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?> print-hide">
+        <div class="mb-6 p-4 rounded-lg <?php echo $tipo_mensaje === 'success' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800'; ?> print-hide">
             <?php echo htmlspecialchars($mensaje); ?>
         </div>
     <?php endif; ?>
@@ -76,7 +76,7 @@ include '../template/header.php';
             <div class="space-y-3">
                 <div class="flex justify-between">
                     <span class="text-gray-600">Ingresos en Efectivo:</span>
-                    <span class="font-bold text-green-600">+$<?php echo number_format($ingresos_efectivo, 2); ?></span>
+                    <span class="font-bold text-blue-600">+$<?php echo number_format($ingresos_efectivo, 2); ?></span>
                 </div>
                 <div class="flex justify-between border-b pb-3">
                     <span class="text-gray-600">Egresos en Efectivo:</span>
@@ -216,7 +216,7 @@ include '../template/header.php';
                                             Completo
                                         </span>
                                     <?php else: ?>
-                                        <span class="px-3 py-1 rounded-full text-sm font-bold <?php echo $arqueo['tipo_diferencia'] === 'sobrante' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
+                                        <span class="px-3 py-1 rounded-full text-sm font-bold <?php echo $arqueo['tipo_diferencia'] === 'sobrante' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800'; ?>">
                                             <?php echo ucfirst($arqueo['tipo_diferencia']); ?>
                                         </span>
                                     <?php endif; ?>
@@ -246,7 +246,7 @@ include '../template/header.php';
             <i class="fas fa-arrow-left mr-2"></i>Volver a Inicio
         </a>
         
-        <button onclick="window.print()" class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition duration-300">
+        <button onclick="window.print()" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300">
             <i class="fas fa-print mr-2"></i>Imprimir Cierre de Caja
         </button>
     </div>

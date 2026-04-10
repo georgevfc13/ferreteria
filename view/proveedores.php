@@ -50,7 +50,7 @@ include '../template/header.php';
                     <p class="text-gray-700 mb-2"><i class="fas fa-phone mr-2"></i><?php echo htmlspecialchars($proveedor['telefono'] ?? 'Sin teléfono'); ?></p>
                     <p class="text-gray-700 mb-4"><i class="fas fa-envelope mr-2"></i><?php echo htmlspecialchars($proveedor['email'] ?? 'Sin email'); ?></p>
                     <a href="https://web.whatsapp.com/send?phone=<?php echo preg_replace('/[^0-9]/', '', $proveedor['telefono']); ?>&text=<?php echo urlencode('Solicito más productos'); ?>"
-                        class="inline-flex items-center bg-green-500 text-white px-4 py-2 rounded-full font-semibold hover:bg-green-600 transition duration-300"
+                        class="inline-flex items-center bg-blue-600 text-white px-4 py-2 rounded-full font-semibold hover:bg-blue-700 transition duration-300"
                         target="_blank"
                         rel="noopener noreferrer">
                         <i class="fab fa-whatsapp mr-2"></i>Enviar Mensaje
@@ -130,7 +130,7 @@ include '../template/header.php';
         <h2 id="modalTitle" class="text-2xl font-bold text-dark mb-4">Eliminar Proveedor</h2>
         <p class="text-gray-700 mb-4">Para confirmar la eliminación, ingresa el código de seguridad:</p>
 
-        <div class="bg-yellow-100 border border-yellow-400 rounded p-3 mb-4">
+        <div class="bg-gray-100 border border-gray-400 rounded p-3 mb-4">
             <p id="confirmationCode" class="font-mono text-center text-lg font-bold text-dark">Código: 000000</p>
         </div>
 

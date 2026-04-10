@@ -21,7 +21,7 @@
                 </div>
             </div>
             <div class="border-t border-gray-600 mt-8 pt-6 text-center">
-                <p>&copy; 2026 Ferretería JJ y George.</p>
+                <p>&copy; 2026 Ferretería 2J y George.</p>
             </div>
         </div>
     </footer>
