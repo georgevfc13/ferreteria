@@ -135,10 +135,10 @@ include '../template/header.php';
             <table class="min-w-full table-auto bg-white rounded-lg">
                 <thead class="bg-primary text-secondary">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Día</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Ingresos</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Gastos</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Ganancia Neta</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white">Día</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white">Ingresos</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white">Gastos</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white">Ganancia Neta</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
