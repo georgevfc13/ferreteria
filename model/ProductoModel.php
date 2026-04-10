@@ -81,9 +81,9 @@ if (!function_exists('getProductoById')) {
 }
 
 if (!function_exists('getProductosBajoStock')) {
-    function getProductosBajoStock($umbral = 10) {
+    function getProductosBajoStock($umbral = 5) {
         global $conn;
-        $sql = "SELECT * FROM productos WHERE stock <= ? AND activo = 1 ORDER BY stock ASC";
+        $sql = "SELECT * FROM productos WHERE stock < ? AND activo = 1 ORDER BY stock ASC";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $umbral);
         $stmt->execute();

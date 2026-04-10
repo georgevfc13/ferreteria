@@ -49,7 +49,7 @@ include '../template/header.php';
                     <p class="text-gray-700 mb-2"><strong>Contacto:</strong> <?php echo htmlspecialchars($proveedor['contacto'] ?? 'Sin contacto'); ?></p>
                     <p class="text-gray-700 mb-2"><i class="fas fa-phone mr-2"></i><?php echo htmlspecialchars($proveedor['telefono'] ?? 'Sin teléfono'); ?></p>
                     <p class="text-gray-700 mb-4"><i class="fas fa-envelope mr-2"></i><?php echo htmlspecialchars($proveedor['email'] ?? 'Sin email'); ?></p>
-                    <a href="https://web.whatsapp.com/send<?php echo preg_replace('/[^0-9]/', '', $proveedor['telefono']); ?>?text=Solicito%20más%20productos"
+                    <a href="https://web.whatsapp.com/send?phone=<?php echo preg_replace('/[^0-9]/', '', $proveedor['telefono']); ?>&text=<?php echo urlencode('Solicito más productos'); ?>"
                         class="inline-flex items-center bg-green-500 text-white px-4 py-2 rounded-full font-semibold hover:bg-green-600 transition duration-300"
                         target="_blank"
                         rel="noopener noreferrer">

@@ -6,7 +6,7 @@ include '../controller/InventarioController.php';
 $filtro = $_GET['filtro'] ?? 'default';
 $productos = getProductos($filtro);
 $proveedores = getProveedores();
-$productosBajoStock = getProductosBajoStock(10);
+$productosBajoStock = getProductosBajoStock(5);
 
 include '../template/header.php';
 ?>
