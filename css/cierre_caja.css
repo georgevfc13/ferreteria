@@ -12,12 +12,17 @@
     }
     
     /* Ocultar todo excepto el histórico */
-    .grid, .print-header + div:not(.bg-white.rounded-lg.shadow-lg:last-of-type) {
+    body > * {
         display: none !important;
     }
     
-    /* Ajustar el contenedor principal */
+    #historico-cierres {
+        display: block !important;
+    }
+    
+    /* Quitar fondo de la página */
     body {
+        background: white !important;
         margin: 0;
         padding: 20px;
     }
@@ -62,7 +67,7 @@
     }
     
     /* Título para la tabla en impresión */
-    section::before {
+    #historico-cierres::before {
         content: "Histórico de Cierres de Caja";
         display: block;
         font-size: 24px;

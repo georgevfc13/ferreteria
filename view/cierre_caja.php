@@ -182,7 +182,7 @@ include '../template/header.php';
     <?php endif; ?>
 
     <!-- Historico de Cierres -->
-    <div class="bg-white rounded-lg shadow-lg p-6">
+    <div id="historico-cierres" class="bg-white rounded-lg shadow-lg p-6">
         <h2 class="text-2xl font-bold text-gray-800 mb-4">Histórico de Cierres</h2>
         
         <?php
