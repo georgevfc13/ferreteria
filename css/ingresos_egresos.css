@@ -151,7 +151,41 @@ textarea.form-input::placeholder {
         box-shadow: 0 0 20px 10px rgba(102, 126, 234, 0);
     }
 }
-
+/* Estilos de impresión */
+@media print {
+    /* Ocultar elementos no deseados */
+    header, footer, nav, .print-hide, #formContainer, #chartContainer, .bg-gray-50.rounded-xl.shadow-md.p-8:has(h2:contains("Detalles por Día")), #deleteModal {
+        display: none !important;
+    }
+    
+    /* Mostrar solo la lista de movimientos */
+    .bg-gray-50.rounded-xl.shadow-md.p-8:has(h2:contains("Lista de Movimientos")) {
+        display: block !important;
+        page-break-inside: avoid;
+    }
+    
+    /* Cuando se imprime egresos, ocultar ingresos */
+    body.print-egresos .movimiento-ingreso {
+        display: none !important;
+    }
+    
+    /* Fondo blanco */
+    body {
+        background: white !important;
+        margin: 0;
+        padding: 20px;
+    }
+    
+    /* Ajustar tabla si es necesario */
+    table {
+        page-break-inside: auto;
+    }
+    
+    tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+}
 .chart-pulse {
     animation: chartPulse 1.5s ease-in-out;
 }

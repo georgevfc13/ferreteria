@@ -157,11 +157,16 @@ include '../template/header.php';
 
     <!-- Lista de Movimientos con Eliminar -->
     <div class="bg-gray-50 rounded-xl shadow-md p-8 mt-8">
-        <h2 class="text-2xl font-semibold text-dark mb-6 text-center">Lista de Movimientos</h2>
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-semibold text-dark">Lista de Movimientos</h2>
+            <button onclick="printEgresos()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">
+                <i class="fas fa-print mr-2"></i>Imprimir Egresos
+            </button>
+        </div>
         <div class="space-y-4">
             <?php if (!empty($ingresos_egresos)): ?>
                 <?php foreach ($ingresos_egresos as $mov): ?>
-                    <div class="flex justify-between items-center bg-white p-4 rounded-lg shadow">
+                    <div class="flex justify-between items-center bg-white p-4 rounded-lg shadow movimiento-<?php echo $mov['tipo']; ?>">
                         <div>
                             <p class="font-semibold text-dark"><?php echo ucfirst($mov['tipo']); ?>: $<?php echo number_format($mov['monto'], 2); ?> - <?php echo $mov['descripcion']; ?> (<?php echo $mov['categoria']; ?>)</p>
                             <p class="text-sm text-blue-800"><?php echo $mov['fecha']; ?></p>

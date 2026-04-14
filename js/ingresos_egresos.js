@@ -295,3 +295,17 @@ function showAnimationIfNeeded() {
 
 // Ejecutar al cargar la página
 document.addEventListener('DOMContentLoaded', showAnimationIfNeeded);
+
+// ===== FUNCIÓN PARA IMPRIMIR SOLO EGRESOS =====
+function printEgresos() {
+    // Agregar clase al body para activar el modo de impresión de egresos
+    document.body.classList.add('print-egresos');
+    
+    // Imprimir
+    window.print();
+    
+    // Quitar la clase después de un breve delay para que la impresión se complete
+    setTimeout(() => {
+        document.body.classList.remove('print-egresos');
+    }, 1000);
+}
